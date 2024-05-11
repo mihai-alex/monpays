@@ -1,0 +1,6 @@
+<mat-card class="container">
+  <mat-card-content class="card">
+    <h1>Hello, {{ username }}!</h1>
+    <button mat-raised-button color="primary" [routerLink]="['/change-password/{{username}}']">Change Password</button>
+  </mat-card-content>
+</mat-card>

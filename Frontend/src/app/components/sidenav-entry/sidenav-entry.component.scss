@@ -1,0 +1,51 @@
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 219px;
+  background-color: inherit;
+  //box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1) inset;
+  padding: 32px;
+  margin: 20px;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 0;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+  text-underline: none;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  color: #e8e8e8;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.content .heading {
+  font-weight: 700;
+  font-size: 32px;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(-45deg, #4CAF50 0%, #009681 100% );
+  z-index: -1;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.card:hover::before {
+  width: 100%;
+}
+
+.card:hover {
+  box-shadow: 0 0 6px 6px #009681 inset;
+}
+

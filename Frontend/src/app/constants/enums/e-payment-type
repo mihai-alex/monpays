@@ -1,0 +1,4 @@
+export enum EPaymentType {
+  INTERNAL = "INTERNAL",
+  EXTERNAL = "EXTERNAL",
+}

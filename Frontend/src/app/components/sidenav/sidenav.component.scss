@@ -1,0 +1,32 @@
+.logo {
+  text-align: center;
+  padding: 2.6rem 1rem;
+  img {
+    width: 200px;
+    border-radius: 32px;
+  }
+
+  .mat-icon {
+    vertical-align: center;
+    margin-left: 1rem;
+  }
+}
+
+/* Apply styles to the mat-nav-list and its items */
+.custom-nav-list {
+  color: whitesmoke; /* Set the text color to white */
+}
+
+.custom-mat-expansion-panel {
+  background-color: #008674;
+  color: whitesmoke;
+}
+
+.custom-inner-mat-expansion-panel {
+  background-color: #007767;
+  color: whitesmoke;
+}
+
+.nav-link-span {
+  color: whitesmoke;
+}

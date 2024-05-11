@@ -1,0 +1,194 @@
+<!------------------------------------------------------------- REFACTOR BELOW ------------------------------------------------------------->
+
+<div class="user-changes">
+  <mat-card>
+    <mat-card-content class="card">
+      <h3>View User Details</h3>
+      <div>
+        <div class="key-value">
+          <label> <b>Username: </b> {{ user.userName }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>First Name: </b> {{ user.firstName }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Last Name: </b> {{ user.lastName }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Email: </b> {{ user.emailAddress }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Phone number: </b> {{ user.phoneNumber }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Address: </b> {{ user.address }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Profile name: </b> {{ user.profileName }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Status: </b> {{ user.status }} </label>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- TODO: make invisible if entity is not pending OR if current user does not have rights -->
+  <mat-card>
+    <mat-card-content *ngIf="pendingUser.userName" class="card">
+      <h3>View Pending User Details</h3>
+      <div>
+        <div class="key-value">
+          <label> <b>Username: </b> {{ pendingUser.userName }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>First Name: </b> {{ pendingUser.firstName }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Last Name: </b> {{ pendingUser.lastName }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Email: </b> {{ pendingUser.emailAddress }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Phone number: </b> {{ pendingUser.phoneNumber }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Address: </b> {{ pendingUser.address }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Profile name: </b> {{ pendingUser.profileName }} </label>
+        </div>
+        <div class="key-value">
+          <label> <b>Status: </b> {{ pendingUser.status }} </label>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="actions">
+  <label>Actions: </label>
+  <!-- TODO: Implement the following actions/buttons -->
+  <button
+    *ngIf="isAllowed(EOperationType.BLOCK)"
+    mat-button
+    color="primary"
+    (click)="blockUser(userName)"
+  >
+    Block
+  </button>
+  <button
+    *ngIf="isAllowed(EOperationType.UNBLOCK)"
+    mat-button
+    color="primary"
+    (click)="unblockUser(userName)"
+  >
+    Unblock
+  </button>
+  <button
+    [disabled]="
+      !(isAllowed(EOperationType.REPAIR) && user.status === 'IN_REPAIR')
+    "
+    mat-button
+    color="primary"
+    (click)="repairUser(userName)"
+  >
+    Repair
+  </button>
+  <button
+    *ngIf="isAllowed(EOperationType.APPROVE)"
+    mat-button
+    color="primary"
+    (click)="approveChanges(userName)"
+  >
+    Approve changes
+  </button>
+  <button
+    *ngIf="isAllowed(EOperationType.REJECT)"
+    mat-button
+    color="warn"
+    (click)="rejectChanges(userName)"
+  >
+    Reject changes
+  </button>
+  <button mat-button (click)="onCancel()">Go back</button>
+</div>
+
+<div class="user-history">
+  <h2>User History</h2>
+  <table mat-table class="table" [dataSource]="userHistoryDataSource" matSort>
+    <ng-container matColumnDef="userName">
+      <th mat-header-cell *matHeaderCellDef>Username</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.userName }}</td>
+    </ng-container>
+    <ng-container matColumnDef="firstName">
+      <th mat-header-cell *matHeaderCellDef>First name</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.firstName }}</td>
+    </ng-container>
+    <ng-container matColumnDef="lastName">
+      <th mat-header-cell *matHeaderCellDef>Last name</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.lastName }}</td>
+    </ng-container>
+    <ng-container matColumnDef="emailAddress">
+      <th mat-header-cell *matHeaderCellDef>Email</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.emailAddress }}</td>
+    </ng-container>
+    <ng-container matColumnDef="phoneNumber">
+      <th mat-header-cell *matHeaderCellDef>Phone number</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.phoneNumber }}</td>
+    </ng-container>
+    <ng-container matColumnDef="address">
+      <th mat-header-cell *matHeaderCellDef>Address</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.address }}</td>
+    </ng-container>
+    <ng-container matColumnDef="profileName">
+      <th mat-header-cell *matHeaderCellDef>Profile Name</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.profileName }}</td>
+    </ng-container>
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>User status</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.status }}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumnsHistory"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumnsHistory"></tr>
+  </table>
+  <mat-paginator
+    #userHistoryPaginator
+    [pageSizeOptions]="[5, 10, 25]"
+    showFirstLastButtons
+  ></mat-paginator>
+</div>
+
+<div class="user-audit">
+  <h2>User Audit</h2>
+  <table mat-table class="table" [dataSource]="userAuditDataSource" matSort>
+    <ng-container matColumnDef="userName">
+      <th mat-header-cell *matHeaderCellDef>Username</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.username }}</td>
+    </ng-container>
+    <ng-container matColumnDef="executedOperation">
+      <th mat-header-cell *matHeaderCellDef>Executed operation</th>
+      <td mat-cell *matCellDef="let entry">{{ entry.operation.operation }}</td>
+    </ng-container>
+    <ng-container matColumnDef="classProfileName">
+      <th mat-header-cell *matHeaderCellDef>Class name</th>
+      <td mat-cell *matCellDef="let entry">
+        {{ entry.operation.groupName }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="timestamp">
+      <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+      <td mat-cell *matCellDef="let entry">
+        {{ formatTimestamp(entry.timestamp) }}
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumnsAudit"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumnsAudit"></tr>
+  </table>
+  <mat-paginator
+    #userAuditPaginator
+    [pageSizeOptions]="[5, 10, 25]"
+    showFirstLastButtons
+  ></mat-paginator>
+</div>

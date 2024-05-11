@@ -1,0 +1,92 @@
+<div class="col-md-6 offset-md-3">
+  <h3>Create Profile</h3>
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput type="text" formControlName="name" />
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Profile Type</mat-label>
+        <mat-select
+          formControlName="type"
+          (selectionChange)="onProfileTypeChange()"
+        >
+          <mat-option *ngFor="let type of profileTypes" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group operations-group">
+      <h4>Select User Operations:</h4>
+      <div *ngFor="let operation of userAvailableOperations">
+        <mat-checkbox
+          [checked]="userOperations.includes(operation)"
+          (change)="onUserCheckboxChange($event, operation)"
+        >
+          {{ operation }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="form-group operations-group">
+      <h4>Select Profile Operations:</h4>
+      <div *ngFor="let operation of profileAvailableOperations">
+        <mat-checkbox
+          [checked]="profileOperations.includes(operation)"
+          (change)="onProfileCheckboxChange($event, operation)"
+        >
+          {{ operation }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="form-group operations-group">
+      <h4>Select Account Operations:</h4>
+      <div *ngFor="let operation of accountAvailableOperations">
+        <mat-checkbox
+          [checked]="accountOperations.includes(operation)"
+          (change)="onAccountCheckboxChange($event, operation)"
+        >
+          {{ operation }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="form-group operations-group">
+      <h4>Select Balance Operations:</h4>
+      <div *ngFor="let operation of balanceAvailableOperations">
+        <mat-checkbox
+          [checked]="balanceOperations.includes(operation)"
+          (change)="onBalanceCheckboxChange($event, operation)"
+        >
+          {{ operation }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="form-group operations-group">
+      <h4>Select Payment Operations:</h4>
+      <div *ngFor="let operation of paymentAvailableOperations">
+        <mat-checkbox
+          [checked]="paymentOperations.includes(operation)"
+          (change)="onPaymentCheckboxChange($event, operation)"
+        >
+          {{ operation }}
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+      <button mat-raised-button color="warn" type="button" (click)="onCancel()">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

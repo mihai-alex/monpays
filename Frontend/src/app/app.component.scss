@@ -1,0 +1,27 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+mat-drawer {
+  width: 260px;
+  background-color: #009681;
+}
+
+mat-drawer-container {
+  height: 100%;
+}
+
+/* Style the header */
+app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Adjust the margin-top for the content to accommodate the header */
+.container {
+  margin-top: 64px; /* Height of the header */
+  /* Adjust margin-top based on your header height and layout requirements */
+}

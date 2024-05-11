@@ -1,0 +1,70 @@
+/* Profile List Component SCSS with Material-UI (MUI) styles */
+h2 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.filter-input {
+  margin-bottom: 16px;
+  width: 100%;
+
+  input {
+    font-size: 14px;
+    padding: 8px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+}
+
+.mui-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th.mui-header-cell,
+  td.mui-cell {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+  }
+
+  th.mui-header-cell {
+    font-weight: bold;
+  }
+
+  tr.mat-row {
+    display: flex; /* Set display to flex to make each row horizontal */
+    justify-content: space-between; /* Distribute cells with equal space between them */
+    align-items: center; /* Vertically center the cell contents */
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+
+  tr.mat-row.mat-expanded {
+    background-color: #f5f5f5;
+  }
+
+  th.mat-sort-header {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+}
+
+.mui-paginator {
+  margin-top: 20px;
+
+  .mat-paginator-container {
+    display: flex;
+    justify-content: flex-end;
+
+    button.mat-paginator-navigation-previous,
+    button.mat-paginator-navigation-next {
+      margin-left: 5px;
+    }
+  }
+}

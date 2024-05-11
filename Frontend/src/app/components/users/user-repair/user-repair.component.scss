@@ -1,0 +1,74 @@
+.col-md-6 {
+  margin-top: 30px;
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-select {
+  width: 100%;
+}
+
+.operations-group {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.mat-checkbox {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+h4 {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* Style the Submit button */
+button[type="submit"] {
+  width: 48%;
+}
+
+/* Style the Cancel button */
+button[type="button"] {
+  width: 48%;
+  background-color: #ff3d00; /* Orange color, you can adjust it to your preference */
+  color: #ffffff; /* White text color */
+}
+
+/* Adjust the layout for small screens */
+@media (max-width: 767px) {
+  .col-md-6 {
+    padding: 0 15px;
+  }
+
+  /* Adjust the buttons layout for small screens */
+  .buttons {
+    flex-direction: column;
+  }
+
+  /* Adjust individual button width for small screens */
+  button[type="submit"],
+  button[type="button"] {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}

@@ -1,0 +1,77 @@
+/* Custom styling for the Create Profile form */
+.col-md-6 {
+  margin-top: 30px;
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+/* Adjust label and input styles for mat-form-field */
+.mat-form-field {
+  width: 100%;
+}
+
+/* Style the mat-select */
+.mat-select {
+  width: 100%;
+}
+
+/* Style the operations groups */
+.operations-group {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* Style the checkboxes and their labels */
+.mat-checkbox {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+h4 {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Style the buttons container */
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+/* Style the Submit button */
+button[type="submit"] {
+  width: 48%; /* Adjust the width as needed */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+/* Style the Cancel button */
+button[type="button"] {
+  width: 48%; /* Adjust the width as needed */
+  background-color: #f44336; /* Red color */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+/* Adjust the layout for small screens */
+@media (max-width: 767px) {
+  .col-md-6 {
+    padding: 0 15px;
+  }
+}

@@ -1,0 +1,154 @@
+<!-- Profile List Component HTML with Material-UI (MUI) styles -->
+<h2>Payment List</h2>
+
+<!-- Filter input -->
+<mat-form-field class="filter-input">
+  <input
+    matInput
+    (keyup)="applyFilter($event)"
+    placeholder="Filter by matching text on any column"
+  />
+</mat-form-field>
+
+<mat-divider></mat-divider>
+
+<button
+  *ngIf="isAllowed(EOperationType.CREATE)"
+  (click)="createPayment()"
+  mat-button
+  color="primary"
+  style="margin-right: 10px"
+>
+  Create a new payment
+</button>
+
+<mat-divider style="height: 40px"></mat-divider>
+
+<table
+  mat-table
+  [dataSource]="dataSource"
+  matSort
+  matPaginator
+  class="mui-table"
+>
+  <!-- Number Column -->
+  <ng-container matColumnDef="number">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      class="mui-header-cell"
+    >
+      Number
+    </th>
+    <td mat-cell *matCellDef="let payment" class="mui-cell">
+      {{ payment.number }}
+    </td>
+  </ng-container>
+
+  <!-- Timestamp Column -->
+  <ng-container matColumnDef="timestamp">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      class="mui-header-cell"
+    >
+      Timestamp
+    </th>
+    <td mat-cell *matCellDef="let payment" class="mui-cell">
+      {{ payment.timestamp }}
+    </td>
+  </ng-container>
+
+  <!-- Currency Column -->
+  <ng-container matColumnDef="currency">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      class="mui-header-cell"
+    >
+      Currency
+    </th>
+    <td mat-cell *matCellDef="let payment" class="mui-cell">
+      {{ payment.currency }}
+    </td>
+  </ng-container>
+
+  <!-- Amount Column -->
+  <ng-container matColumnDef="amount">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      class="mui-header-cell"
+    >
+      Amount
+    </th>
+    <td mat-cell *matCellDef="let payment" class="mui-cell">
+      {{ payment.amount }}
+    </td>
+  </ng-container>
+
+  <!-- Debit Account Number Column -->
+  <ng-container matColumnDef="debitAccountNumber">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      class="mui-header-cell"
+    >
+      Debit Account Number
+    </th>
+    <td mat-cell *matCellDef="let payment" class="mui-cell">
+      {{ payment.debitAccountNumber }}
+    </td>
+  </ng-container>
+
+  <!-- Credit Account Number Column -->
+  <ng-container matColumnDef="creditAccountNumber">
+    <th
+      mat-header-cell
+      *matHeaderCellDef
+      mat-sort-header
+      class="mui-header-cell"
+    >
+      Credit Account Number
+    </th>
+    <td mat-cell *matCellDef="let payment" class="mui-cell">
+      {{ payment.creditAccountNumber }}
+    </td>
+  </ng-container>
+
+  <!-- Actions Column -->
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef class="mui-header-cell">Actions</th>
+    <td mat-cell *matCellDef="let payment" class="mui-cell">
+      <button
+        (click)="detailsPayment(payment.number)"
+        mat-button
+        color="primary"
+        style="margin-right: 10px"
+      >
+        Details
+      </button>
+    </td>
+  </ng-container>
+
+  <!-- Header row -->
+  <tr
+    mat-header-row
+    *matHeaderRowDef="displayedColumns; sticky: true"
+    class="mui-header-row"
+  ></tr>
+  <!-- Data rows -->
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+
+<!-- Paginator -->
+<mat-paginator
+  [pageSizeOptions]="[5, 10, 25, 100]"
+  showFirstLastButtons
+  class="mui-paginator"
+></mat-paginator>

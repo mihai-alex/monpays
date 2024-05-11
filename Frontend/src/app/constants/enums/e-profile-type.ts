@@ -1,0 +1,5 @@
+export enum EProfileType {
+  ADMINISTRATOR = 'ADMINISTRATOR',
+  EMPLOYEE = 'EMPLOYEE',
+  CUSTOMER = 'CUSTOMER',
+}

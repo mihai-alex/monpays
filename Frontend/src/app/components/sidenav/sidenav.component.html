@@ -1,0 +1,81 @@
+<mat-nav-list class="custom-nav-list">
+  <div class="logo py-4">
+    <img ngSrc="assets/images/logo_white.png" alt = "Company Logo" height="200" width="200"/>
+  </div>
+  <mat-divider></mat-divider>
+
+  <!-- Loop through each sidenav item and pass it to the sidenav-entry component -->
+  <app-sidenav-entry
+    *ngFor="let sidenavItem of sidenavItems | async"
+    [sidenavEntry]="sidenavItem">
+  </app-sidenav-entry>
+
+<!--  &lt;!&ndash; Profiles Dropdown &ndash;&gt;-->
+<!--  <div class="operations">r-->
+<!--    <mat-expansion-panel class="custom-mat-expansion-panel">-->
+<!--      <mat-expansion-panel-header>Profiles</mat-expansion-panel-header>-->
+<!--      <a-->
+<!--        mat-list-item-->
+<!--        routerLink="/profile-list"-->
+<!--        routerLinkActive="list-item-active"-->
+<!--        class="nav-link"-->
+<!--      >-->
+<!--        <span class="nav-link-span">List</span>-->
+<!--      </a>-->
+<!--      <a-->
+<!--        mat-list-item-->
+<!--        routerLink="/profile-create"-->
+<!--        routerLinkActive="list-item-active"-->
+<!--        class="nav-link"-->
+<!--      >-->
+<!--        <span class="nav-link-span">Create Profile</span>-->
+<!--      </a>-->
+<!--    </mat-expansion-panel>-->
+<!--  </div>-->
+
+<!--  &lt;!&ndash; Users Dropdown &ndash;&gt;-->
+<!--  <div class="operations">-->
+<!--    <mat-expansion-panel class="custom-mat-expansion-panel">-->
+<!--      <mat-expansion-panel-header>Users</mat-expansion-panel-header>-->
+<!--      <a-->
+<!--        mat-list-item-->
+<!--        routerLink="/user-list"-->
+<!--        routerLinkActive="list-item-active"-->
+<!--        class="nav-link"-->
+<!--      >-->
+<!--        <span class="nav-link-span">List</span>-->
+<!--      </a>-->
+<!--      <a-->
+<!--        mat-list-item-->
+<!--        routerLink="/user-create"-->
+<!--        routerLinkActive="list-item-active"-->
+<!--        class="nav-link"-->
+<!--      >-->
+<!--        <span class="nav-link-span">Create User</span>-->
+<!--      </a>-->
+<!--    </mat-expansion-panel>-->
+<!--  </div>-->
+
+<!--  &lt;!&ndash; Accounts Dropdown &ndash;&gt;-->
+<!--  <div class="operations">-->
+<!--    <mat-expansion-panel class="custom-mat-expansion-panel">-->
+<!--      <mat-expansion-panel-header>Accounts</mat-expansion-panel-header>-->
+<!--      <a-->
+<!--        mat-list-item-->
+<!--        routerLink="/account-list"-->
+<!--        routerLinkActive="list-item-active"-->
+<!--        class="nav-link"-->
+<!--      >-->
+<!--        <span class="nav-link-span">List</span>-->
+<!--      </a>-->
+<!--      <a-->
+<!--        mat-list-item-->
+<!--        routerLink="/account-create"-->
+<!--        routerLinkActive="list-item-active"-->
+<!--        class="nav-link"-->
+<!--      >-->
+<!--        <span class="nav-link-span">Create Account</span>-->
+<!--      </a>-->
+<!--    </mat-expansion-panel>-->
+<!--  </div>-->
+</mat-nav-list>

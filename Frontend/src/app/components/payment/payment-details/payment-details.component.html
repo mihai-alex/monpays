@@ -1,0 +1,234 @@
+<div class="account-changes">
+  <mat-card *ngIf="payment">
+    <mat-card-content class="card">
+      <h3>View Payment Details</h3>
+      <div>
+        <!-- number!: string;
+  timestamp?: string;
+  currency!: string;
+  amount!: number;
+  debitAccountNumber!: string; // the money is transferred FROM this account
+  creditAccountNumber!: string; // the money is transferred INTO this account
+  description!: string;
+  type?: string;
+  status?: string;
+
+  history: PaymentHistoryEntry[] = [];
+  audit: AuditEntry[] = []; -->
+        <!-- } -->
+
+        <div class="key-value">
+          <label><b>Number:</b> {{ payment.number }}</label>
+        </div>
+        <div class="key-value">
+          <label><b>Timestamp:</b> {{ payment.timestamp }}</label>
+        </div>
+        <div class="key-value">
+          <label><b>Currency:</b> {{ payment.currency }}</label>
+        </div>
+        <div class="key-value">
+          <label><b>Amount:</b> {{ payment.amount }}</label>
+        </div>
+        <div class="key-value">
+          <label
+            ><b>Debit Account Number:</b>
+            {{ payment.debitAccountNumber }}</label
+          >
+        </div>
+        <div class="key-value">
+          <label
+            ><b>Credit Account Number:</b>
+            {{ payment.creditAccountNumber }}</label
+          >
+        </div>
+        <div class="key-value">
+          <label><b>Description:</b> {{ payment.description }}</label>
+        </div>
+        <div class="key-value">
+          <label><b>Type:</b> {{ payment.type }}</label>
+        </div>
+        <div class="key-value">
+          <label><b>Status:</b> {{ payment.status }}</label>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="actions">
+    <button
+      *ngIf="isAllowed(EOperationType.REPAIR) && payment.status === 'IN_REPAIR'"
+      mat-button
+      color="primary"
+      (click)="repair(paymentNumber)"
+    >
+      Repair
+    </button>
+
+    <button
+      *ngIf="
+        isAllowed(EOperationType.APPROVE) &&
+        (payment.status === 'CREATED' || payment.status === 'REPAIRED')
+      "
+      mat-button
+      color="primary"
+      (click)="approve(paymentNumber)"
+    >
+      Approve
+    </button>
+
+    <button
+      *ngIf="
+        isAllowed(EOperationType.VERIFY) &&
+        payment.status === 'WAITING_VERIFICATION'
+      "
+      mat-button
+      color="primary"
+      (click)="verify(paymentNumber)"
+    >
+      Verify
+    </button>
+
+    <button
+      *ngIf="
+        isAllowed(EOperationType.AUTHORIZE) &&
+        payment.status === 'WAITING_AUTHORIZATION'
+      "
+      mat-button
+      color="primary"
+      (click)="authorize(paymentNumber)"
+    >
+      Authorize
+    </button>
+
+    <button
+      *ngIf="
+        isAllowed(EOperationType.REJECT) &&
+        (payment.status === 'CREATED' ||
+          payment.status === 'REPAIRED' ||
+          payment.status === 'WAITING_VERIFICATION' ||
+          payment.status === 'WAITING_AUTHORIZATION')
+      "
+      mat-button
+      color="primary"
+      (click)="reject(paymentNumber)"
+    >
+      Reject
+    </button>
+
+    <button
+      *ngIf="
+        isAllowed(EOperationType.CANCEL) &&
+        (payment.status === 'CREATED' ||
+          payment.status === 'IN_REPAIR' ||
+          payment.status === 'REPAIRED' ||
+          payment.status === 'WAITING_VERIFICATION' ||
+          payment.status === 'WAITING_AUTHORIZATION')
+      "
+      mat-button
+      color="primary"
+      (click)="cancel(paymentNumber)"
+    >
+      Cancel
+    </button>
+  </div>
+
+  <div class="payment-history">
+    <h2>Payment History</h2>
+    <table
+      mat-table
+      class="table"
+      [dataSource]="paymentHistoryDataSource"
+      matSort
+    >
+      <ng-container matColumnDef="number">
+        <th mat-header-cell *matHeaderCellDef>Number</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.number }}</td>
+      </ng-container>
+      <ng-container matColumnDef="timestamp">
+        <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+        <td mat-cell *matCellDef="let entry">
+          {{ formatTimestamp(entry.timestamp) }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="currency">
+        <th mat-header-cell *matHeaderCellDef>Currency</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.currency }}</td>
+      </ng-container>
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef>Amount</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.amount }}</td>
+      </ng-container>
+      <ng-container matColumnDef="debitAccount">
+        <th mat-header-cell *matHeaderCellDef>Debit Account Number</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.debitAccount }}</td>
+      </ng-container>
+      <ng-container matColumnDef="creditAccount">
+        <th mat-header-cell *matHeaderCellDef>Credit Account Number</th>
+        <td mat-cell *matCellDef="let entry">
+          {{ entry.creditAccount }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.description }}</td>
+      </ng-container>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.type }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.status }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsHistory"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsHistory"></tr>
+    </table>
+    <mat-paginator
+      #paymentHistoryPaginator
+      [pageSizeOptions]="[5, 10, 25]"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+
+  <div class="payment-audit">
+    <h2>Payment Audit</h2>
+    <table
+      mat-table
+      class="table"
+      [dataSource]="paymentAuditDataSource"
+      matSort
+    >
+      <ng-container matColumnDef="userName">
+        <th mat-header-cell *matHeaderCellDef>Username</th>
+        <td mat-cell *matCellDef="let entry">{{ entry.username }}</td>
+      </ng-container>
+      <ng-container matColumnDef="executedOperation">
+        <th mat-header-cell *matHeaderCellDef>Executed operation</th>
+        <td mat-cell *matCellDef="let entry">
+          {{ entry.operation.operation }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="classProfileName">
+        <th mat-header-cell *matHeaderCellDef>Class name</th>
+        <td mat-cell *matCellDef="let entry">
+          {{ entry.operation.groupName }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="timestamp">
+        <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+        <td mat-cell *matCellDef="let entry">
+          {{ formatTimestamp(entry.timestamp) }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsAudit"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsAudit"></tr>
+    </table>
+    <mat-paginator
+      #paymentAuditPaginator
+      [pageSizeOptions]="[5, 10, 25]"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+</div>

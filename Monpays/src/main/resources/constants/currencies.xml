@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<currencies>
+    <currency>
+        <code>EUR</code>
+        <fractionDigits>2</fractionDigits>
+    </currency>
+    <currency>
+        <code>GBP</code>
+        <fractionDigits>2</fractionDigits>
+    </currency>
+    <currency>
+        <code>CHF</code>
+        <fractionDigits>2</fractionDigits>
+    </currency>
+    <currency>
+        <code>USD</code>
+        <fractionDigits>2</fractionDigits>
+    </currency>
+    <currency>
+        <code>RON</code>
+        <fractionDigits>2</fractionDigits>
+    </currency>
+</currencies>

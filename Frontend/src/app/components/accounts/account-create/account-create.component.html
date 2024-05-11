@@ -1,0 +1,46 @@
+<div class="col-md-6 offset-md-3">
+  <h3>Create Account</h3>
+
+  <!-- TODO: make it possible to create account for another user (if current user has rights) -->
+
+  <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Owner after creation</mat-label>
+        <input matInput type="text" [value]="owner" readonly />
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Currency</mat-label>
+        <mat-select formControlName="currency">
+          <mat-option *ngFor="let currency of currencyTypes" [value]="currency">
+            {{ currency }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Name</mat-label>
+        <input matInput type="text" formControlName="name" />
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Transaction Limit</mat-label>
+        <input matInput type="number" formControlName="transactionLimit" />
+      </mat-form-field>
+    </div>
+
+    <div class="buttons">
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+      <button mat-raised-button color="warn" type="button" (click)="onCancel()">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
