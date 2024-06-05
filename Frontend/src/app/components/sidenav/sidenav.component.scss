@@ -1,32 +1,43 @@
 .logo {
   text-align: center;
   padding: 2.6rem 1rem;
-  img {
-    width: 200px;
-    border-radius: 32px;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the content horizontally */
+  justify-content: center; /* Center the content vertically */
+}
 
-  .mat-icon {
-    vertical-align: center;
-    margin-left: 1rem;
-  }
+.logo img {
+  width: 200px;
+  border-radius: 32px;
+}
+
+.logo .mat-icon {
+  vertical-align: middle; /* Center align the icon vertically */
+  margin-left: 1rem;
 }
 
 /* Apply styles to the mat-nav-list and its items */
 .custom-nav-list {
   color: whitesmoke; /* Set the text color to white */
+  text-align: center; /* Center the text */
 }
 
+/* Custom styles for mat-expansion-panel */
 .custom-mat-expansion-panel {
   background-color: #008674;
   color: whitesmoke;
+  text-align: center; /* Center the text */
 }
 
+/* Custom styles for inner mat-expansion-panel */
 .custom-inner-mat-expansion-panel {
   background-color: #007767;
   color: whitesmoke;
+  text-align: center; /* Center the text */
 }
 
 .nav-link-span {
   color: whitesmoke;
+  text-align: center; /* Center the text */
 }
