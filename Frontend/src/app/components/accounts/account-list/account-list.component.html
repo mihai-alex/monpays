@@ -23,174 +23,178 @@
 
 <mat-divider style="height: 40px"></mat-divider>
 
-<table
-  mat-table
-  [dataSource]="dataSource"
-  matSort
-  matPaginator
-  class="mui-table"
->
-  <!-- Account Number Column -->
-  <ng-container matColumnDef="accountNumber">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Account Number
-    </th>
-    <td mat-cell *matCellDef="let account" class="mui-cell">
-      {{ account.accountNumber }}
-    </td>
-  </ng-container>
-
-  <!-- Owner Column -->
-  <ng-container matColumnDef="owner">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Owner
-    </th>
-    <td mat-cell *matCellDef="let account" class="mui-cell">
-      {{ account.owner }}
-    </td>
-  </ng-container>
-
-  <!-- Currency Column -->
-  <ng-container matColumnDef="currency">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Currency
-    </th>
-    <td mat-cell *matCellDef="let account" class="mui-cell">
-      {{ account.currency }}
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="name">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Name
-    </th>
-    <td mat-cell *matCellDef="let account" class="mui-cell">
-      {{ account.name }}
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="transactionLimit">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Transaction Limit
-    </th>
-    <td mat-cell *matCellDef="let account" class="mui-cell">
-      {{ account.transactionLimit }}
-    </td>
-  </ng-container>
-
-  <!-- Status Column -->
-  <ng-container matColumnDef="status">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Status
-    </th>
-    <td mat-cell *matCellDef="let account" class="mui-cell">
-      {{ account.status }}
-    </td>
-  </ng-container>
-
-  <!-- Account Status Column -->
-  <ng-container matColumnDef="accountLockStatus">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Account Status
-    </th>
-    <td mat-cell *matCellDef="let account" class="mui-cell">
-      {{ account.accountLockStatus }}
-    </td>
-  </ng-container>
-
-  <!-- Actions Column -->
-  <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef class="mui-header-cell">Actions</th>
-    <td mat-cell *matCellDef="let account" class="mui-cell">
-      <button
-        (click)="detailsAccount(account.accountNumber)"
-        mat-button
-        color="primary"
-        style="margin-right: 10px"
+<div class="table-container">
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    matSort
+    matPaginator
+    class="mui-table"
+  >
+    <!-- Account Number Column -->
+    <ng-container matColumnDef="accountNumber">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
       >
-        Details
-      </button>
-      <button
-        *ngIf="isAllowed(EOperationType.MODIFY)"
-        (click)="modifyAccount(account.accountNumber)"
-        mat-button
-        color="primary"
-        style="margin-right: 10px"
-        [disabled]="account.status === 'REMOVED'"
-      >
-        Modify
-      </button>
-      <button
-        *ngIf="isAllowed(EOperationType.CLOSE)"
-        (click)="closeAccount(account.accountNumber)"
-        mat-button
-        color="warn"
-        style="margin-right: 10px"
-        [disabled]="
-          account.accountLockStatus === 'CLOSED' || account.status === 'REMOVED'
-        "
-      >
-        Close
-      </button>
-      <button
-        *ngIf="isAllowed(EOperationType.REMOVE)"
-        (click)="removeAccount(account.accountNumber)"
-        mat-button
-        color="warn"
-        style="margin-right: 10px"
-        [disabled]="
-          account.accountLockStatus !== 'CLOSED' || account.status === 'REMOVED'
-        "
-      >
-        Remove
-      </button>
-    </td>
-  </ng-container>
+        Account Number
+      </th>
+      <td mat-cell *matCellDef="let account" class="mui-cell">
+        {{ account.accountNumber }}
+      </td>
+    </ng-container>
 
-  <!-- Header row -->
-  <tr
-    mat-header-row
-    *matHeaderRowDef="displayedColumns; sticky: true"
-    class="mui-header-row"
-  ></tr>
-  <!-- Data rows -->
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-</table>
+    <!-- Owner Column -->
+    <ng-container matColumnDef="owner">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Owner
+      </th>
+      <td mat-cell *matCellDef="let account" class="mui-cell">
+        {{ account.owner }}
+      </td>
+    </ng-container>
+
+    <!-- Currency Column -->
+    <ng-container matColumnDef="currency">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Currency
+      </th>
+      <td mat-cell *matCellDef="let account" class="mui-cell">
+        {{ account.currency }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Name
+      </th>
+      <td mat-cell *matCellDef="let account" class="mui-cell">
+        {{ account.name }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="transactionLimit">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Transaction Limit
+      </th>
+      <td mat-cell *matCellDef="let account" class="mui-cell">
+        {{ account.transactionLimit }}
+      </td>
+    </ng-container>
+
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Status
+      </th>
+      <td mat-cell *matCellDef="let account" class="mui-cell">
+        {{ account.status }}
+      </td>
+    </ng-container>
+
+    <!-- Account Status Column -->
+    <ng-container matColumnDef="accountLockStatus">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Account Status
+      </th>
+      <td mat-cell *matCellDef="let account" class="mui-cell">
+        {{ account.accountLockStatus }}
+      </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="mui-header-cell">Actions</th>
+      <td mat-cell *matCellDef="let account" class="mui-cell">
+        <button
+          (click)="detailsAccount(account.accountNumber)"
+          mat-button
+          color="primary"
+          style="margin-right: 10px"
+        >
+          Details
+        </button>
+        <button
+          *ngIf="isAllowed(EOperationType.MODIFY)"
+          (click)="modifyAccount(account.accountNumber)"
+          mat-button
+          color="primary"
+          style="margin-right: 10px"
+          [disabled]="account.status === 'REMOVED'"
+        >
+          Modify
+        </button>
+        <button
+          *ngIf="isAllowed(EOperationType.CLOSE)"
+          (click)="closeAccount(account.accountNumber)"
+          mat-button
+          color="warn"
+          style="margin-right: 10px"
+          [disabled]="
+            account.accountLockStatus === 'CLOSED' ||
+            account.status === 'REMOVED'
+          "
+        >
+          Close
+        </button>
+        <button
+          *ngIf="isAllowed(EOperationType.REMOVE)"
+          (click)="removeAccount(account.accountNumber)"
+          mat-button
+          color="warn"
+          style="margin-right: 10px"
+          [disabled]="
+            account.accountLockStatus !== 'CLOSED' ||
+            account.status === 'REMOVED'
+          "
+        >
+          Remove
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- Header row -->
+    <tr
+      mat-header-row
+      *matHeaderRowDef="displayedColumns; sticky: true"
+      class="mui-header-row"
+    ></tr>
+    <!-- Data rows -->
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
 
 <!-- Paginator -->
 <mat-paginator

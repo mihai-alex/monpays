@@ -5,47 +5,59 @@
   justify-content: center;
   width: 219px;
   background-color: inherit;
-  //box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1) inset;
-  padding: 32px;
-  margin: 20px;
+  padding: 16px; /* Reduced padding for a more compact look */
+  margin: 16px; /* Adjusted margin for consistency */
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 12px; /* Slightly reduced border radius for a modern look */
   border: 0;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
-  text-underline: none;
+  text-decoration: none; /* Ensure no underline on card text */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
+  transition: box-shadow 0.3s ease; /* Smooth transition for box shadow */
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
+  align-items: center; /* Centered buttons */
+  gap: 12px; /* Reduced gap for a more compact layout */
   color: #e8e8e8;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+  font-family: Arial, sans-serif; /* Simple font */
+  font-size: 14px; /* Smaller font size */
+  text-decoration: none; /* Remove underline */
+  transition: color 0.3s ease; /* Smooth transition for color */
 }
 
 .content .heading {
   font-weight: 700;
-  font-size: 32px;
+  font-size: 24px; /* Reduced font size for better balance */
+  text-decoration: none; /* Remove underline */
+  text-align: center; /* Centered heading text */
 }
 
-.card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 0;
-  height: 100%;
-  background: linear-gradient(-45deg, #4CAF50 0%, #009681 100% );
-  z-index: -1;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+a {
+  text-decoration: none; /* Remove underline for all anchor tags */
+  color: inherit; /* Ensure anchor tags inherit the text color */
 }
 
-.card:hover::before {
-  width: 100%;
+button {
+  display: flex; /* Use flexbox for centering */
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+  // padding: 10px 12px 6px; /* Increased upper padding */
+  font-family: Arial, sans-serif; /* Match font with the content */
+  font-size: 14px; /* Match font size with the content */
+  border: none; /* Remove default button border */
+  border-radius: 8px; /* Rounded corners for buttons */
+  background-color: #4caf50; /* Button background color */
+  color: #fff; /* Button text color */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+button:hover {
+  background-color: #009681; /* Darker background color on hover */
 }
 
 .card:hover {
-  box-shadow: 0 0 6px 6px #009681 inset;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow effect on hover */
 }
-

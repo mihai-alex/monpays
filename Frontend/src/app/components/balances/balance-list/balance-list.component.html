@@ -14,231 +14,233 @@
 
 <mat-divider style="height: 40px"></mat-divider>
 
-<table
-  mat-table
-  [dataSource]="dataSource"
-  matSort
-  matPaginator
-  class="mui-table"
->
-  <!-- 'timestamp',
-'accountNumber',
-'availableAmount',
-'pendingAmount',
-'projectedAmount',
-'availableCreditAmount',
-'availableCreditCount',
-'availableDebitAmount',
-'availableDebitCount',
-'pendingCreditAmount',
-'pendingCreditCount',
-'pendingDebitAmount',
-'pendingDebitCount', -->
+<div class="table-container">
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    matSort
+    matPaginator
+    class="mui-table"
+  >
+    <!-- 'timestamp',
+    'accountNumber',
+    'availableAmount',
+    'pendingAmount',
+    'projectedAmount',
+    'availableCreditAmount',
+    'availableCreditCount',
+    'availableDebitAmount',
+    'availableDebitCount',
+    'pendingCreditAmount',
+    'pendingCreditCount',
+    'pendingDebitAmount',
+    'pendingDebitCount', -->
 
-  <!-- timestamp Column -->
-  <ng-container matColumnDef="timestamp">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Timestamp
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ formatTimestamp(balance.timestamp) }}
-    </td>
-  </ng-container>
+    <!-- timestamp Column -->
+    <ng-container matColumnDef="timestamp">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Timestamp
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ formatTimestamp(balance.timestamp) }}
+      </td>
+    </ng-container>
 
-  <!-- accountNumber Column -->
-  <ng-container matColumnDef="accountNumber">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Account Number
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.accountNumber }}
-    </td>
-  </ng-container>
+    <!-- accountNumber Column -->
+    <ng-container matColumnDef="accountNumber">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Account Number
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.accountNumber }}
+      </td>
+    </ng-container>
 
-  <!-- availableAmount Column -->
-  <ng-container matColumnDef="availableAmount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Available Amount
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.availableAmount }}
-    </td>
-  </ng-container>
+    <!-- availableAmount Column -->
+    <ng-container matColumnDef="availableAmount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Available Amount
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.availableAmount }}
+      </td>
+    </ng-container>
 
-  <!-- pendingAmount Column -->
-  <ng-container matColumnDef="pendingAmount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Pending Amount
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.pendingAmount }}
-    </td>
-  </ng-container>
+    <!-- pendingAmount Column -->
+    <ng-container matColumnDef="pendingAmount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Pending Amount
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.pendingAmount }}
+      </td>
+    </ng-container>
 
-  <!-- projectedAmount Column -->
-  <ng-container matColumnDef="projectedAmount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Projected Amount
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.projectedAmount }}
-    </td>
-  </ng-container>
+    <!-- projectedAmount Column -->
+    <ng-container matColumnDef="projectedAmount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Projected Amount
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.projectedAmount }}
+      </td>
+    </ng-container>
 
-  <!-- availableCreditAmount Column -->
-  <ng-container matColumnDef="availableCreditAmount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Available Credit Amount
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.availableCreditAmount }}
-    </td>
-  </ng-container>
+    <!-- availableCreditAmount Column -->
+    <ng-container matColumnDef="availableCreditAmount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Available Credit Amount
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.availableCreditAmount }}
+      </td>
+    </ng-container>
 
-  <!-- availableCreditCount Column -->
-  <ng-container matColumnDef="availableCreditCount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Available Credit Count
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.availableCreditCount }}
-    </td>
-  </ng-container>
+    <!-- availableCreditCount Column -->
+    <ng-container matColumnDef="availableCreditCount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Available Credit Count
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.availableCreditCount }}
+      </td>
+    </ng-container>
 
-  <!-- availableDebitAmount Column -->
-  <ng-container matColumnDef="availableDebitAmount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Available Debit Amount
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.availableDebitAmount }}
-    </td>
-  </ng-container>
+    <!-- availableDebitAmount Column -->
+    <ng-container matColumnDef="availableDebitAmount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Available Debit Amount
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.availableDebitAmount }}
+      </td>
+    </ng-container>
 
-  <!-- availableDebitCount Column -->
-  <ng-container matColumnDef="availableDebitCount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Available Debit Count
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.availableDebitCount }}
-    </td>
-  </ng-container>
+    <!-- availableDebitCount Column -->
+    <ng-container matColumnDef="availableDebitCount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Available Debit Count
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.availableDebitCount }}
+      </td>
+    </ng-container>
 
-  <!-- pendingCreditAmount Column -->
-  <ng-container matColumnDef="pendingCreditAmount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Pending Credit Amount
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.pendingCreditAmount }}
-    </td>
-  </ng-container>
+    <!-- pendingCreditAmount Column -->
+    <ng-container matColumnDef="pendingCreditAmount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Pending Credit Amount
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.pendingCreditAmount }}
+      </td>
+    </ng-container>
 
-  <!-- pendingCreditCount Column -->
-  <ng-container matColumnDef="pendingCreditCount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Pending Credit Count
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.pendingCreditCount }}
-    </td>
-  </ng-container>
+    <!-- pendingCreditCount Column -->
+    <ng-container matColumnDef="pendingCreditCount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Pending Credit Count
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.pendingCreditCount }}
+      </td>
+    </ng-container>
 
-  <!-- pendingDebitAmount Column -->
-  <ng-container matColumnDef="pendingDebitAmount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Pending Debit Amount
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.pendingDebitAmount }}
-    </td>
-  </ng-container>
+    <!-- pendingDebitAmount Column -->
+    <ng-container matColumnDef="pendingDebitAmount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Pending Debit Amount
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.pendingDebitAmount }}
+      </td>
+    </ng-container>
 
-  <!-- pendingDebitCount Column -->
-  <ng-container matColumnDef="pendingDebitCount">
-    <th
-      mat-header-cell
-      *matHeaderCellDef
-      mat-sort-header
-      class="mui-header-cell"
-    >
-      Pending Debit Count
-    </th>
-    <td mat-cell *matCellDef="let balance" class="mui-cell">
-      {{ balance.pendingDebitCount }}
-    </td>
-  </ng-container>
+    <!-- pendingDebitCount Column -->
+    <ng-container matColumnDef="pendingDebitCount">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header
+        class="mui-header-cell"
+      >
+        Pending Debit Count
+      </th>
+      <td mat-cell *matCellDef="let balance" class="mui-cell">
+        {{ balance.pendingDebitCount }}
+      </td>
+    </ng-container>
 
-  <!-- Header row -->
-  <tr
-    mat-header-row
-    *matHeaderRowDef="displayedColumns; sticky: true"
-    class="mui-header-row"
-  ></tr>
-  <!-- Data rows -->
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-</table>
+    <!-- Header row -->
+    <tr
+      mat-header-row
+      *matHeaderRowDef="displayedColumns; sticky: true"
+      class="mui-header-row"
+    ></tr>
+    <!-- Data rows -->
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
 
 <!-- Paginator -->
 <mat-paginator

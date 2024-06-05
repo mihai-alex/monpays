@@ -1,4 +1,3 @@
-/* Profile List Component SCSS with Material-UI (MUI) styles */
 h2 {
   margin-top: 16px;
   margin-bottom: 16px;
@@ -17,8 +16,14 @@ h2 {
   }
 }
 
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Enables horizontal scrolling */
+}
+
 .mui-table {
   width: 100%;
+  min-width: 1000px; /* Ensures the table has a minimum width for scrolling */
   border-collapse: collapse;
 
   th.mui-header-cell,
