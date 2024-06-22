@@ -13,6 +13,14 @@ import { SidenavComponent } from '../sidenav/sidenav.component';
   styleUrls: ['./change-password.component.scss'],
 })
 export class ChangePasswordComponent {
+  passwordRequirements: string[] = [
+    'At least 8 characters long',
+    'Contains at least 1 lowercase letter (a-z)',
+    'Contains at least 1 uppercase letter (A-Z)',
+    'Contains at least 1 digit (0-9)',
+    'Contains at least 1 symbol (e.g., !@#$%^&*)',
+  ];
+
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -26,7 +34,9 @@ export class ChangePasswordComponent {
 
     // Validate the new password and its confirmation
     if (formData.newPassword !== formData.confirmNewPassword) {
-      console.error('The input is not valid.');
+      this.snackBar.open('The input is not valid!', 'Close', {
+        duration: 4000,
+      });
       return;
     }
 
