@@ -82,7 +82,7 @@ public class AuthenticationService implements IAuthenticationService {
                 throw new RuntimeException("Concurrent update detected. Please try again.");
             }
 
-            throw new AuthenticationException("Wrong password, sir!");
+            throw new AuthenticationException("Wrong password!");
         }
 
         // Reset failed login attempts on successful login
@@ -188,17 +188,19 @@ public class AuthenticationService implements IAuthenticationService {
         userActivityService.add(user, "change_password", "AuthenticationController");
 
         if(user.getStatus() != EUserStatus.ACTIVE) {
-            throw new ServiceException("Your account is not active, sir!");
+            throw new ServiceException("Your account is not active!");
         }
 
         if (userChangePasswordDto.getNewPassword() == null ||
-                !bCryptPasswordEncoder.matches(userChangePasswordDto.getOldPassword(), user.getPassword())) {
+                !bCryptPasswordEncoder.matches(userChangePasswordDto.getOldPassword(), user.getPassword()) ||
+                userChangePasswordDto.getNewPassword().equals(userChangePasswordDto.getOldPassword()) ||
+                !PasswordUtils.validatePassword(userChangePasswordDto.getNewPassword())) {
             throw new ServiceException("Invalid password!");
         }
 
         String oldPassword = userChangePasswordDto.getOldPassword();
         if (!bCryptPasswordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new AuthenticationException("Wrong password, sir!");
+            throw new AuthenticationException("Wrong password!");
         }
 
         String new_hashed_password = bCryptPasswordEncoder.encode(userChangePasswordDto.getNewPassword());

@@ -613,7 +613,7 @@ public class AccountService implements IAccountService {
 
     private boolean block(User actor, Operation operation, Account toBlockAccount) {
         if (toBlockAccount.getAccountLockStatus() != EAccountLockStatus.OPEN) {
-            throw new ServiceException("Operation not allowed, sir!");
+            throw new ServiceException("Operation not allowed!");
         }
 
         AccountPending accountPending = accountMapper.mapToAccountPending(toBlockAccount, actor.getUserName());
@@ -653,7 +653,7 @@ public class AccountService implements IAccountService {
                                      User actor, Operation operation, Account toBlockAccount) {
         if (toBlockAccount.getAccountLockStatus() != EAccountLockStatus.OPEN &&
                 toBlockAccount.getAccountLockStatus() != otherBlockStatus) {
-            throw new ServiceException("Operation not allowed, sir!");
+            throw new ServiceException("Operation not allowed!");
         }
 
         AccountPending accountPending = accountMapper.mapToAccountPending(toBlockAccount, actor.getUserName());
@@ -698,7 +698,7 @@ public class AccountService implements IAccountService {
 
     private boolean unblock(User actor, Operation operation, Account toUnblockAccount) {
         if (toUnblockAccount.getAccountLockStatus() != EAccountLockStatus.BLOCKED) {
-            throw new ServiceException("Operation not allowed, sir!");
+            throw new ServiceException("Operation not allowed!");
         }
 
         AccountPending accountPending = accountMapper.mapToAccountPending(toUnblockAccount, actor.getUserName());
@@ -742,7 +742,7 @@ public class AccountService implements IAccountService {
 
         if (toUnblockAccount.getAccountLockStatus() != thisUnblockStatus &&
                 toUnblockAccount.getAccountLockStatus() != EAccountLockStatus.BLOCKED) {
-            throw new ServiceException("Operation not allowed, sir!");
+            throw new ServiceException("Operation not allowed!");
         }
 
         AccountPending accountPending = accountMapper.mapToAccountPending(toUnblockAccount, actor.getUserName());
@@ -787,7 +787,7 @@ public class AccountService implements IAccountService {
 
     private boolean close(User actor, Operation operation, Account toCloseAccount) {
         if (toCloseAccount.getAccountLockStatus() == EAccountLockStatus.CLOSED) {
-            throw new ServiceException("Operation not allowed, sir!");
+            throw new ServiceException("Operation not allowed!");
         }
 
         AccountPending accountPending = accountMapper.mapToAccountPending(toCloseAccount, actor.getUserName());
