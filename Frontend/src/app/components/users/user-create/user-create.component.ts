@@ -17,6 +17,14 @@ export class UserCreateComponent implements OnInit {
   passwordConfirmation: string = ''; // Password confirmation property
   profileNames: string[] = []; // Initialize an array to store profile names
 
+  passwordRequirements: string[] = [
+    'At least 8 characters long',
+    'Contains at least 1 lowercase letter (a-z)',
+    'Contains at least 1 uppercase letter (A-Z)',
+    'Contains at least 1 digit (0-9)',
+    'Contains at least 1 symbol (e.g., !@#$%^&*)',
+  ];
+
   constructor(
     private userService: UserService,
     private profileService: ProfileService, // Inject the profile service
@@ -37,8 +45,11 @@ export class UserCreateComponent implements OnInit {
       passwordConfirmation: ['', Validators.required],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      emailAddress: ['', Validators.required],
-      phoneNumber: ['', Validators.required],
+      emailAddress: ['', [Validators.required, Validators.email]], // Add email validation
+      phoneNumber: [
+        '',
+        [Validators.required, Validators.pattern('^[0-9]{10}$')],
+      ], // Add phone number validation
       address: ['', Validators.required],
       profileName: ['', Validators.required],
       mfaEnabled: [false], // Add the mfaEnabled form control here
