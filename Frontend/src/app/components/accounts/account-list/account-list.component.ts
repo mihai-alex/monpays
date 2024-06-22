@@ -76,11 +76,9 @@ export class AccountListComponent implements OnInit {
         this.getAccounts();
       },
       (error) => {
-        this.snackBar.open(
-          'Sir, your operation could not be executed!',
-          'Close',
-          { duration: 4000 }
-        );
+        this.snackBar.open('The account could not be removed!', 'Close', {
+          duration: 4000,
+        });
         this.getAccounts();
         console.log(error);
       }
@@ -95,11 +93,9 @@ export class AccountListComponent implements OnInit {
         this.getAccounts();
       },
       (error) => {
-        this.snackBar.open(
-          'Sir, your operation could not be executed!',
-          'Close',
-          { duration: 4000 }
-        );
+        this.snackBar.open('The account could not be closed!', 'Close', {
+          duration: 4000,
+        });
         this.getAccounts();
         console.log(error);
       }

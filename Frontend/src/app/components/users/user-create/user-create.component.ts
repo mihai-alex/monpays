@@ -71,11 +71,9 @@ export class UserCreateComponent implements OnInit {
 
       this.createUser();
     } else {
-      this.snackBar.open(
-        'Sir, the entered data is incorrect or the passwords do not match!',
-        'Close',
-        { duration: 4000 }
-      );
+      this.snackBar.open('The user could not be created!', 'Close', {
+        duration: 4000,
+      });
     }
   }
 
@@ -104,7 +102,7 @@ export class UserCreateComponent implements OnInit {
   }
 
   handleUserActionError(error: any) {
-    this.snackBar.open('Sir, your operation could not be executed!', 'Close', {
+    this.snackBar.open('The user could not be created!', 'Close', {
       duration: 4000,
     });
     console.log(error);

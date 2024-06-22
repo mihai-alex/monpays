@@ -67,11 +67,9 @@ export class ProfileListComponent implements OnInit {
       },
       (error) => {
         this.router.navigate(['/profile-list']);
-        this.snackBar.open(
-          'Sir, your operation could not be executed!',
-          'Close',
-          { duration: 4000 }
-        );
+        this.snackBar.open('The profile could not be removed!', 'Close', {
+          duration: 4000,
+        });
         console.log(error);
       }
     );

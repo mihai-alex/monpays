@@ -50,7 +50,7 @@ export class UserModifyComponent {
   }
 
   handleUserActionError(error: any) {
-    this.snackBar.open('Sir, your operation could not be executed!', 'Close', {
+    this.snackBar.open('The user could not be modified!', 'Close', {
       duration: 4000,
     });
     console.log(error);

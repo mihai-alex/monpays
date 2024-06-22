@@ -26,7 +26,7 @@ export class ChangePasswordComponent {
 
     // Validate the new password and its confirmation
     if (formData.newPassword !== formData.confirmNewPassword) {
-      console.error('New passwords do not match');
+      console.error('The input is not valid.');
       return;
     }
 
@@ -46,7 +46,7 @@ export class ChangePasswordComponent {
       (response: any) => {
         const newToken = response;
         this.authService.setToken(newToken);
-        this.snackBar.open('Password changed successfully.', 'Close', {
+        this.snackBar.open('Password changed successfully!', 'Close', {
           duration: 4000,
         });
         this.router.navigateByUrl('/user').then(() => {
@@ -54,7 +54,7 @@ export class ChangePasswordComponent {
         });
       },
       (error: any) => {
-        this.snackBar.open('Sir, your input was not valid.', 'Close', {
+        this.snackBar.open('The input is not valid.', 'Close', {
           duration: 7000,
         });
         console.error(

@@ -151,9 +151,13 @@ export class ProfileDetailsComponent {
   }
 
   handleProfileActionError(error: any) {
-    this.snackBar.open('Sir, your operation could not be executed!', 'Close', {
-      duration: 4000,
-    });
+    this.snackBar.open(
+      'The action could not be performed on the profile!',
+      'Close',
+      {
+        duration: 4000,
+      }
+    );
     console.log(error);
   }
 
