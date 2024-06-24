@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { EOperationType } from 'src/app/constants/enums/e-operation-type';
@@ -7,18 +7,20 @@ import { Operation } from 'src/app/models/operation';
 import { Profile } from 'src/app/models/profile';
 import { ProfileService } from 'src/app/services/profile.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { OperationService } from 'src/app/services/operation.service';
 
 @Component({
   selector: 'app-profile-modify',
   templateUrl: './profile-modify.component.html',
   styleUrls: ['./profile-modify.component.scss'],
 })
-export class ProfileModifyComponent {
+export class ProfileModifyComponent implements OnInit {
   profile: Profile = new Profile();
   profileName: string = '';
 
   profileTypes = Object.values(EProfileType);
-  //operations = Object.values(EOperationType);
   userAvailableOperations: EOperationType[] = [];
   profileAvailableOperations: EOperationType[] = [];
   accountAvailableOperations: EOperationType[] = [];
@@ -31,48 +33,78 @@ export class ProfileModifyComponent {
   balanceOperations: EOperationType[] = [];
   paymentOperations: EOperationType[] = [];
 
+  operations!: Observable<EOperationType[]>;
+
   constructor(
     private profileService: ProfileService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private operationService: OperationService
   ) {}
 
   ngOnInit(): void {
     this.profileName = this.activatedRoute.snapshot.params['name'];
-    this.profileService.getProfileByName(this.profileName).subscribe(
-      (data) => {
-        if (!data) {
-          this.onRedirectToProfileList();
-          return;
+    this.operations = this.operationService.getOperations('profile');
+
+    this.isAllowed(EOperationType.LIST).subscribe((canList) => {
+      this.isAllowed(EOperationType.MODIFY).subscribe((canModify) => {
+        if (!canList || !canModify) {
+          this.router.navigate(['/forbidden']);
+        } else {
+          this.profileService
+            .getProfileByName(this.profileName)
+            .pipe(
+              catchError((error) => {
+                if (error.status === 400) {
+                  return of(null); // Treat 400 error as if data is empty
+                }
+                return throwError(error);
+              })
+            )
+            .subscribe(
+              (data) => {
+                if (!data) {
+                  this.onRedirectToProfileList();
+                  return;
+                }
+
+                this.profile = data;
+
+                this.userOperations = this.profile.rights
+                  .filter((op) => op?.groupName === 'User' && op?.operation)
+                  .map((op) => op!.operation);
+
+                this.profileOperations = this.profile.rights
+                  .filter((op) => op?.groupName === 'Profile' && op?.operation)
+                  .map((op) => op!.operation);
+
+                this.accountOperations = this.profile.rights
+                  .filter((op) => op?.groupName === 'Account' && op?.operation)
+                  .map((op) => op!.operation);
+
+                this.balanceOperations = this.profile.rights
+                  .filter((op) => op?.groupName === 'Balance' && op?.operation)
+                  .map((op) => op!.operation);
+
+                this.paymentOperations = this.profile.rights
+                  .filter((op) => op?.groupName === 'Payment' && op?.operation)
+                  .map((op) => op!.operation);
+
+                // Fetch available operations based on profile type
+                this.fetchAvailableOperations(this.profile.type);
+              },
+              (error) => this.handleProfileActionError(error)
+            );
         }
+      });
+    });
+  }
 
-        this.profile = data;
-
-        this.userOperations = this.profile.rights
-          .filter((op) => op?.groupName === 'User' && op?.operation)
-          .map((op) => op!.operation);
-
-        this.profileOperations = this.profile.rights
-          .filter((op) => op?.groupName === 'Profile' && op?.operation)
-          .map((op) => op!.operation);
-
-        this.accountOperations = this.profile.rights
-          .filter((op) => op?.groupName === 'Account' && op?.operation)
-          .map((op) => op!.operation);
-
-        this.balanceOperations = this.profile.rights
-          .filter((op) => op?.groupName === 'Balance' && op?.operation)
-          .map((op) => op!.operation);
-
-        this.paymentOperations = this.profile.rights
-          .filter((op) => op?.groupName === 'Payment' && op?.operation)
-          .map((op) => op!.operation);
-
-        // Fetch available operations based on profile type
-        this.fetchAvailableOperations(this.profile.type);
-      },
-      (error) => this.handleProfileActionError(error)
+  isAllowed(operationType: EOperationType): Observable<boolean> {
+    return this.operations.pipe(
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
     );
   }
 
@@ -180,30 +212,6 @@ export class ProfileModifyComponent {
   }
 
   modifyProfile() {
-    const userOperations: Operation[] = this.userOperations.map(
-      (op: EOperationType) => this.createOperation(op, 'User')
-    );
-    const profileOperations: Operation[] = this.profileOperations.map(
-      (op: EOperationType) => this.createOperation(op, 'Profile')
-    );
-    const accountOperations: Operation[] = this.accountOperations.map(
-      (op: EOperationType) => this.createOperation(op, 'Account')
-    );
-    const balanceOperations: Operation[] = this.balanceOperations.map(
-      (op: EOperationType) => this.createOperation(op, 'Balance')
-    );
-    const paymentOperations: Operation[] = this.paymentOperations.map(
-      (op: EOperationType) => this.createOperation(op, 'Payment')
-    );
-
-    this.profile.rights = [
-      ...userOperations,
-      ...profileOperations,
-      ...accountOperations,
-      ...balanceOperations,
-      ...paymentOperations,
-    ];
-
     this.profileService.modifyProfile(this.profileName, this.profile).subscribe(
       (data) => {
         this.goToProfileList();

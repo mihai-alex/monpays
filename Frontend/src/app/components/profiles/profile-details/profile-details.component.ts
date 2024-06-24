@@ -8,8 +8,8 @@ import { Profile } from 'src/app/models/profile';
 import { ProfileHistoryEntry } from 'src/app/models/profile-history-entry';
 import { ProfileService } from 'src/app/services/profile.service';
 import { OperationService } from '../../../services/operation.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { EOperationType } from '../../../constants/enums/e-operation-type';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProfilePending } from 'src/app/models/profile-pending';
@@ -38,12 +38,8 @@ export class ProfileDetailsComponent {
   @ViewChild('profileAuditPaginator', { static: false })
   profileAuditPaginator!: MatPaginator;
 
-  displayedColumnsHistory: string[] = [
-    'type',
-    'name',
-    // 'rights', // TODO: uncomment this if the rights are needed
-    'status',
-  ];
+  // add 'rights' to the list of displayed columns if necessary
+  displayedColumnsHistory: string[] = ['type', 'name', 'status'];
   displayedColumnsAudit: string[] = [
     'userName',
     'executedOperation',
@@ -62,8 +58,18 @@ export class ProfileDetailsComponent {
   ngOnInit(): void {
     this.name = this.activatedRoute.snapshot.params['name'];
 
-    this.profileService.getProfileByName(this.name, true, true, true).subscribe(
-      (data) => {
+    this.profileService
+      .getProfileByName(this.name, true, true, true)
+      .pipe(
+        catchError((error) => {
+          if (error.status === 400) {
+            this.router.navigate(['/page-not-found']);
+            return of(null); // Treat 400 error as if data is empty
+          }
+          return throwError(error);
+        })
+      )
+      .subscribe((data) => {
         if (!data) {
           this.onRedirectToProfileList();
           return;
@@ -76,12 +82,7 @@ export class ProfileDetailsComponent {
         // Populate profile history and audit from the fetched profile
         this.profileHistoryDataSource.data = this.profile.history;
         this.profileAuditDataSource.data = this.profile.audit;
-      },
-      (error: any) => {
-        console.log(error);
-        this.onRedirectToProfileList();
-      }
-    );
+      });
 
     this.operations = this.operationService.getOperations('profile');
   }

@@ -1,4 +1,3 @@
-// Profile List Component TypeScript
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
@@ -8,8 +7,8 @@ import { Profile } from 'src/app/models/profile';
 import { ProfileService } from 'src/app/services/profile.service';
 import { OperationService } from '../../../services/operation.service';
 import { EOperationType } from '../../../constants/enums/e-operation-type';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -33,13 +32,21 @@ export class ProfileListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getProfiles();
     this.operations = this.operationService.getOperations('profile');
+
+    this.isAllowed(EOperationType.LIST).subscribe((allowed) => {
+      if (!allowed) {
+        this.router.navigate(['/forbidden']);
+      } else {
+        this.getProfiles();
+      }
+    });
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {
     return this.operations.pipe(
-      map((operationTypesArray) => operationTypesArray.includes(operationType))
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
     );
   }
 
