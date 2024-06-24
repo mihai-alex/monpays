@@ -5,8 +5,8 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { OperationService } from '../../../services/operation.service';
 import { EOperationType } from '../../../constants/enums/e-operation-type';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Balance } from 'src/app/models/balance';
 import { BalanceService } from 'src/app/services/balance.service';
@@ -16,7 +16,7 @@ import { BalanceService } from 'src/app/services/balance.service';
   templateUrl: './balance-list.component.html',
   styleUrls: ['./balance-list.component.scss'],
 })
-export class BalanceListComponent {
+export class BalanceListComponent implements OnInit {
   operations!: Observable<EOperationType[]>;
   displayedColumns: string[] = [
     'timestamp',
@@ -46,18 +46,21 @@ export class BalanceListComponent {
   ) {}
 
   ngOnInit(): void {
-    this.getBalances();
     this.operations = this.operationService.getOperations('balance');
 
-    // console log me all the operations:
-    this.operations.subscribe((data) => {
-      console.log(data);
+    this.isAllowed(EOperationType.LIST).subscribe((allowed) => {
+      if (!allowed) {
+        this.router.navigate(['/forbidden']);
+      } else {
+        this.getBalances();
+      }
     });
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {
     return this.operations.pipe(
-      map((operationTypesArray) => operationTypesArray.includes(operationType))
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
     );
   }
 
