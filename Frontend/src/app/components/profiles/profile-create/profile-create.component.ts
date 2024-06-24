@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { Router } from '@angular/router';
 import { EOperationType } from 'src/app/constants/enums/e-operation-type';
@@ -8,15 +8,16 @@ import { Operation } from 'src/app/models/operation';
 import { Profile } from 'src/app/models/profile';
 import { ProfileService } from 'src/app/services/profile.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
-// ... imports and decorators
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { OperationService } from '../../../services/operation.service';
 
 @Component({
   selector: 'app-profile-create',
   templateUrl: './profile-create.component.html',
   styleUrls: ['./profile-create.component.scss'],
 })
-export class ProfileCreateComponent {
+export class ProfileCreateComponent implements OnInit {
   classProfileNames = ['User', 'Profile', 'Account'];
 
   profileForm!: FormGroup;
@@ -35,22 +36,44 @@ export class ProfileCreateComponent {
   balanceOperations: EOperationType[] = [];
   paymentOperations: EOperationType[] = [];
 
+  operations!: Observable<EOperationType[]>;
+
   constructor(
     private profileService: ProfileService,
+    private operationService: OperationService,
     private router: Router,
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.initForm();
+  }
 
   ngOnInit(): void {
-    this.initForm();
+    this.operations = this.operationService.getOperations('profile');
+
+    this.isAllowed(EOperationType.LIST).subscribe((canList) => {
+      this.isAllowed(EOperationType.CREATE).subscribe((canCreate) => {
+        if (!canList || !canCreate) {
+          this.router.navigate(['/forbidden']);
+        } else {
+          this.fetchProfileNames(); // Fetch profile names when component initializes
+        }
+      });
+    });
   }
 
   initForm() {
     this.profileForm = this.formBuilder.group({
       name: ['', Validators.required],
-      type: null,
+      type: [null, Validators.required],
     });
+  }
+
+  isAllowed(operationType: EOperationType): Observable<boolean> {
+    return this.operations.pipe(
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
+    );
   }
 
   onSubmit() {
@@ -181,7 +204,6 @@ export class ProfileCreateComponent {
   }
 
   onCancel() {
-    //this.goToProfileList();
     window.history.back();
   }
 
@@ -190,6 +212,14 @@ export class ProfileCreateComponent {
       duration: 4000,
     });
     console.log(error);
+  }
+
+  fetchProfileNames() {
+    // Fetch available operations based on the profile type
+    const selectedProfileType = this.profileForm?.get('type')?.value;
+    if (selectedProfileType) {
+      this.fetchAvailableOperations(selectedProfileType);
+    }
   }
 
   fetchAvailableOperations(profileType: EProfileType) {
