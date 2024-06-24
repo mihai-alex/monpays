@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ECurrencyType } from 'src/app/constants/enums/e-currency-type';
 import { Account } from 'src/app/models/account';
 import { AccountService } from 'src/app/services/account.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
+import { EOperationType } from '../../../constants/enums/e-operation-type';
+import { OperationService } from '../../../services/operation.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-account-modify',
@@ -15,26 +19,45 @@ export class AccountModifyComponent implements OnInit {
   accountForm!: FormGroup;
   account: Account = new Account();
   currencyTypes = Object.values(ECurrencyType);
+  operations!: Observable<EOperationType[]>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder,
     private accountService: AccountService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private operationService: OperationService
   ) {}
 
   ngOnInit(): void {
-    this.initForm();
-    this.loadAccount();
+    this.initForm(); // Initialize the form first
+
+    this.operations = this.operationService.getOperations('account');
+
+    this.isAllowed(EOperationType.LIST).subscribe((canList) => {
+      this.isAllowed(EOperationType.MODIFY).subscribe((canModify) => {
+        if (!canList || !canModify) {
+          this.router.navigate(['/forbidden']);
+        } else {
+          this.loadAccount(); // Load the account data after the form initialization
+        }
+      });
+    });
+  }
+
+  isAllowed(operationType: EOperationType): Observable<boolean> {
+    return this.operations.pipe(
+      map((operationTypesArray) => operationTypesArray.includes(operationType))
+    );
   }
 
   initForm() {
     this.accountForm = this.formBuilder.group({
-      owner: [''], // Add owner field to the form
-      currency: [''],
-      name: [''],
-      transactionLimit: [''],
+      owner: ['', Validators.required],
+      currency: ['', Validators.required],
+      name: ['', Validators.required],
+      transactionLimit: ['', [Validators.required, Validators.min(0)]],
     });
   }
 
@@ -64,22 +87,28 @@ export class AccountModifyComponent implements OnInit {
   }
 
   onSubmit() {
-    const formValue = this.accountForm.value;
+    if (this.accountForm.valid) {
+      const formValue = this.accountForm.value;
 
-    // Update the account properties
-    this.account.owner = formValue.owner;
-    this.account.currency = formValue.currency;
-    this.account.name = formValue.name;
-    this.account.transactionLimit = formValue.transactionLimit;
+      // Update the account properties
+      this.account.owner = formValue.owner;
+      this.account.currency = formValue.currency;
+      this.account.name = formValue.name;
+      this.account.transactionLimit = formValue.transactionLimit;
 
-    this.accountService
-      .modifyAccount(this.account.accountNumber, this.account)
-      .subscribe(
-        () => {
-          this.goToAccountList();
-        },
-        (error) => this.handleAccountActionError(error)
-      );
+      this.accountService
+        .modifyAccount(this.account.accountNumber, this.account)
+        .subscribe(
+          () => {
+            this.goToAccountList();
+          },
+          (error) => this.handleAccountActionError(error)
+        );
+    } else {
+      this.snackBar.open('Please fill out the form correctly!', 'Close', {
+        duration: 4000,
+      });
+    }
   }
 
   goToAccountList() {
@@ -87,7 +116,6 @@ export class AccountModifyComponent implements OnInit {
   }
 
   onCancel() {
-    //this.goToAccountList();
     window.history.back();
   }
 
