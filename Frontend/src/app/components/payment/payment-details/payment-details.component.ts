@@ -1,25 +1,24 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuditEntry } from 'src/app/models/audit-entry';
-import { UserService } from 'src/app/services/user.service';
-import { Observable } from 'rxjs';
-import { EOperationType } from '../../../constants/enums/e-operation-type';
-import { OperationService } from '../../../services/operation.service';
-import { map } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { UserPending } from 'src/app/models/user-pending';
 import { Payment } from 'src/app/models/payment';
 import { PaymentHistoryEntry } from 'src/app/models/payment-history-entry';
 import { PaymentService } from 'src/app/services/payment.service';
+import { Observable, throwError, of } from 'rxjs';
+import { EOperationType } from '../../../constants/enums/e-operation-type';
+import { OperationService } from '../../../services/operation.service';
+import { map, catchError } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 @Component({
   selector: 'app-payment-details',
   templateUrl: './payment-details.component.html',
   styleUrls: ['./payment-details.component.scss'],
 })
-export class PaymentDetailsComponent {
+export class PaymentDetailsComponent implements OnInit {
   operations!: Observable<EOperationType[]>;
   payment: Payment = new Payment();
   paymentNumber: string = '';
@@ -67,27 +66,26 @@ export class PaymentDetailsComponent {
 
     this.paymentService
       .getPaymentByPaymentNumber(this.paymentNumber, true, true)
-      .subscribe(
-        (data) => {
-          if (!data) {
-            this.onRedirectToPaymentList();
-            return;
+      .pipe(
+        catchError((error) => {
+          if (error.status === 400) {
+            return of(null); // Treat 400 error as if data is empty
           }
-
-          this.payment = data;
-
-          // Populate account history and audit from the fetched account
-          this.paymentHistoryDataSource.data = this.payment.history;
-          this.paymentAuditDataSource.data = this.payment.audit;
-        },
-        (error: any) => {
-          this.handlePaymentActionError(error);
+          return throwError(error);
+        })
+      )
+      .subscribe((data) => {
+        if (!data) {
+          this.onRedirectToPaymentList();
+          return;
         }
-      );
-  }
 
-  onRedirectToPaymentList() {
-    this.router.navigate(['/payment-list']);
+        this.payment = data;
+
+        // Populate payment history and audit from the fetched payment
+        this.paymentHistoryDataSource.data = this.payment.history;
+        this.paymentAuditDataSource.data = this.payment.audit;
+      });
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {
@@ -159,6 +157,14 @@ export class PaymentDetailsComponent {
     );
   }
 
+  repair(paymentNumber: string) {
+    this.router.navigate(['/payment-repair', paymentNumber]);
+  }
+
+  onRedirectToPaymentList() {
+    this.router.navigate(['/payment-list']);
+  }
+
   onCancel() {
     window.history.back();
   }
@@ -176,11 +182,6 @@ export class PaymentDetailsComponent {
       }
     );
     console.log(error);
-  }
-
-  repair(paymentNumber: string) {
-    // redirect to repair page:
-    this.router.navigate(['/payment-repair', paymentNumber]);
   }
 
   protected readonly EOperationType = EOperationType;

@@ -3,22 +3,20 @@ import { Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Profile } from 'src/app/models/profile';
-import { ProfileService } from 'src/app/services/profile.service';
-import { OperationService } from '../../../services/operation.service';
-import { EOperationType } from '../../../constants/enums/e-operation-type';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { PaymentService } from 'src/app/services/payment.service';
 import { Payment } from 'src/app/models/payment';
+import { PaymentService } from 'src/app/services/payment.service';
+import { OperationService } from 'src/app/services/operation.service';
+import { EOperationType } from 'src/app/constants/enums/e-operation-type';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-payment-list',
   templateUrl: './payment-list.component.html',
   styleUrls: ['./payment-list.component.scss'],
 })
-export class PaymentListComponent {
+export class PaymentListComponent implements OnInit {
   operations!: Observable<EOperationType[]>;
   displayedColumns: string[] = [
     'number',
@@ -28,7 +26,6 @@ export class PaymentListComponent {
     'debitAccountNumber',
     'creditAccountNumber',
     'actions',
-    // TODO: add more if needed
   ];
   dataSource!: MatTableDataSource<Payment>;
 
@@ -43,13 +40,21 @@ export class PaymentListComponent {
   ) {}
 
   ngOnInit(): void {
-    this.getPayments();
     this.operations = this.operationService.getOperations('payment');
+
+    this.isAllowed(EOperationType.LIST).subscribe((allowed) => {
+      if (!allowed) {
+        this.router.navigate(['/forbidden']);
+      } else {
+        this.getPayments();
+      }
+    });
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {
     return this.operations.pipe(
-      map((operationTypesArray) => operationTypesArray.includes(operationType))
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
     );
   }
 
@@ -63,7 +68,13 @@ export class PaymentListComponent {
   }
 
   createPayment(): void {
-    this.router.navigate(['/payment-create']);
+    this.isAllowed(EOperationType.CREATE).subscribe((allowed) => {
+      if (allowed) {
+        this.router.navigate(['/payment-create']);
+      } else {
+        this.router.navigate(['/forbidden']);
+      }
+    });
   }
 
   detailsPayment(paymentNumber: string) {
@@ -96,7 +107,6 @@ export class PaymentListComponent {
         data.amount.toString().toLowerCase().indexOf(term) === -1 &&
         data.debitAccountNumber.toLowerCase().indexOf(term) === -1 &&
         data.creditAccountNumber.toLowerCase().indexOf(term) === -1
-        // TODO: add more if needed
       ) {
         return false;
       }
