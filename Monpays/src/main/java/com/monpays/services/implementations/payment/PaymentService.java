@@ -130,9 +130,9 @@ public class PaymentService implements IPaymentService {
         if(!actor.hasRight(operation)) {
             throw new ServiceException("Sir, you don't have the right to view all payments.");
         }
-        if(actor.getProfile().getType() == EProfileType.CUSTOMER) {
-            throw new ServiceException("Sir, you don't have the right to view all payments.");
-        }
+//        if(actor.getProfile().getType() == EProfileType.CUSTOMER) {
+//            throw new ServiceException("Sir, you don't have the right to view all payments.");
+//        }
 
         auditService.add(actor, operation, null);
         return paymentRepository.findAll()
