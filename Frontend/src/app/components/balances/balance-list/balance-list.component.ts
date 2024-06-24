@@ -47,7 +47,12 @@ export class BalanceListComponent {
 
   ngOnInit(): void {
     this.getBalances();
-    this.operations = this.operationService.getOperations('profile');
+    this.operations = this.operationService.getOperations('balance');
+
+    // console log me all the operations:
+    this.operations.subscribe((data) => {
+      console.log(data);
+    });
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {

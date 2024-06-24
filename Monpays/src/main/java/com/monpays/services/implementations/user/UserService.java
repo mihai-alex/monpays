@@ -70,7 +70,7 @@ public class UserService implements IUserService {
 
         userActivityService.add(actor, "filterUsers", User.class.getSimpleName());
 
-        Operation operation = new Operation(EOperationType.LIST, Profile.class.getSimpleName());
+        Operation operation = new Operation(EOperationType.LIST, User.class.getSimpleName());
         if(!actor.hasRight(operation)) {
             throw new ServiceException("");
         }

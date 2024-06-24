@@ -5,6 +5,10 @@ import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { ProfileService } from 'src/app/services/profile.service'; // Import the profile service
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
+import { EOperationType } from '../../../constants/enums/e-operation-type';
+import { OperationService } from '../../../services/operation.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-create',
@@ -25,17 +29,37 @@ export class UserCreateComponent implements OnInit {
     'Contains at least 1 symbol (e.g., !@#$%^&*)',
   ];
 
+  operations!: Observable<EOperationType[]>;
+
   constructor(
     private userService: UserService,
     private profileService: ProfileService, // Inject the profile service
+    private operationService: OperationService,
     private router: Router,
     private formBuilder: FormBuilder, // Inject FormBuilder
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.initForm(); // Ensure the form is initialized in the constructor
+  }
 
   ngOnInit(): void {
-    this.initForm();
-    this.fetchProfileNames(); // Fetch profile names when component initializes
+    this.operations = this.operationService.getOperations('user');
+
+    this.isAllowed(EOperationType.LIST).subscribe((canList) => {
+      this.isAllowed(EOperationType.CREATE).subscribe((canCreate) => {
+        if (!canList || !canCreate) {
+          this.router.navigate(['/forbidden']);
+        } else {
+          this.fetchProfileNames(); // Fetch profile names when component initializes
+        }
+      });
+    });
+  }
+
+  isAllowed(operationType: EOperationType): Observable<boolean> {
+    return this.operations.pipe(
+      map((operationTypesArray) => operationTypesArray.includes(operationType))
+    );
   }
 
   initForm() {
@@ -69,7 +93,7 @@ export class UserCreateComponent implements OnInit {
 
   onSubmit() {
     if (this.userForm.valid && this.passwordsMatch()) {
-      //this.account.currency = formValue.currency;
+      // this.account.currency = formValue.currency;
       this.user.userName = this.userForm.value.userName;
       this.user.password = this.userForm.value.password;
       this.user.firstName = this.userForm.value.firstName;

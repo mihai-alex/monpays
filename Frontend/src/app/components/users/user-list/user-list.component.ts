@@ -5,10 +5,10 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { EOperationType } from '../../../constants/enums/e-operation-type';
 import { OperationService } from '../../../services/operation.service';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -40,14 +40,21 @@ export class UserListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Get users from backend
-    this.getUsers();
-    this.operations = this.operationService.getOperations('profile');
+    this.operations = this.operationService.getOperations('user');
+
+    this.isAllowed(EOperationType.LIST).subscribe((allowed) => {
+      if (!allowed) {
+        this.router.navigate(['/forbidden']);
+      } else {
+        this.getUsers();
+      }
+    });
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {
     return this.operations.pipe(
-      map((operationTypesArray) => operationTypesArray.includes(operationType))
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
     );
   }
 
