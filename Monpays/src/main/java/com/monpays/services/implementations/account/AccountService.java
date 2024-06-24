@@ -92,15 +92,16 @@ public class AccountService implements IAccountService {
         userActivityService.add(actor, "filterAccounts", Account.class.getSimpleName());
 
         // TODO: remove pagination and return a list
-        Operation operation = new Operation(EOperationType.LIST, Profile.class.getSimpleName());
+        Operation operation = new Operation(EOperationType.LIST, Account.class.getSimpleName());
         if(!actor.hasRight(operation)) {
-            throw new ServiceException("");
+            throw new ServiceException("no rights test");
         }
 
         auditService.add(actor, operation, null);
 
-        Specification<Account> specification = AccountSpecifications.filterByColumn(columnName, filterValue);
-        return accountRepository.findAll(specification).stream().map(accountMapper::toResponseDto).toList();
+//        Specification<Account> specification = AccountSpecifications.filterByColumn(columnName, filterValue);
+//        return accountRepository.findAll(specification).stream().map(accountMapper::toResponseDto).toList();
+        return accountRepository.findAll().stream().map(accountMapper::toResponseDto).collect(Collectors.toList());
     }
 
     @Override
