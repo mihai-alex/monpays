@@ -1,40 +1,72 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ECurrencyType } from 'src/app/constants/enums/e-currency-type';
 import { Account } from 'src/app/models/account';
 import { AccountService } from 'src/app/services/account.service';
+import { UserAuthService } from 'src/app/services/user-auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
+import { EOperationType } from 'src/app/constants/enums/e-operation-type';
+import { OperationService } from 'src/app/services/operation.service';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-account-repair',
   templateUrl: './account-repair.component.html',
   styleUrls: ['./account-repair.component.scss'],
 })
-export class AccountRepairComponent {
+export class AccountRepairComponent implements OnInit {
   accountForm!: FormGroup;
+  owner: string = '';
   account: Account = new Account();
   currencyTypes = Object.values(ECurrencyType);
+  operations!: Observable<EOperationType[]>;
 
   constructor(
-    private route: ActivatedRoute,
+    private accountService: AccountService,
+    private userAuthService: UserAuthService,
+    private operationService: OperationService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private accountService: AccountService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.owner = this.userAuthService.getUsername();
+    this.operations = this.operationService.getOperations('account');
+
+    this.isAllowed(EOperationType.LIST).subscribe((canList) => {
+      this.isAllowed(EOperationType.REPAIR).subscribe((canRepair) => {
+        if (!canList || !canRepair) {
+          this.router.navigate(['/forbidden']);
+        } else {
+          this.initForm();
+          this.loadAccount();
+        }
+      });
+    });
+
+    // Ensure the form is initialized before attempting to use it
     this.initForm();
-    this.loadAccount();
+  }
+
+  isAllowed(operationType: EOperationType): Observable<boolean> {
+    return this.operations.pipe(
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
+    );
   }
 
   initForm() {
     this.accountForm = this.formBuilder.group({
-      owner: [''], // Add owner field to the form
-      currency: [''],
-      name: [''],
-      transactionLimit: [''],
+      owner: [this.owner],
+      currency: ['', Validators.required],
+      name: ['', Validators.required],
+      // make transaction limit positive:
+      transactionLimit: ['', [Validators.required, Validators.min(0)]],
     });
   }
 
@@ -64,16 +96,26 @@ export class AccountRepairComponent {
   }
 
   onSubmit() {
-    const formValue = this.accountForm.value;
+    if (this.accountForm.valid) {
+      // Get the form values
+      const formValue = this.accountForm.value;
 
-    // Update the account properties
-    this.account.owner = formValue.owner;
-    this.account.currency = formValue.currency;
-    this.account.name = formValue.name;
-    this.account.transactionLimit = formValue.transactionLimit;
+      // Set account properties from form values
+      this.account.owner = formValue.owner;
+      this.account.currency = formValue.currency;
+      this.account.name = formValue.name;
+      this.account.transactionLimit = formValue.transactionLimit;
+      this.createAccount();
+    } else {
+      this.snackBar.open('Please fill out the form correctly!', 'Close', {
+        duration: 4000,
+      });
+    }
+  }
 
+  createAccount() {
     this.accountService.createAccount(this.account).subscribe(
-      () => {
+      (account) => {
         this.goToAccountList();
       },
       (error) => this.handleAccountActionError(error)
@@ -85,12 +127,11 @@ export class AccountRepairComponent {
   }
 
   onCancel() {
-    //this.goToAccountList();
     window.history.back();
   }
 
   handleAccountActionError(error: any) {
-    this.snackBar.open('The account could not be repaired!', 'Close', {
+    this.snackBar.open('The account could not be repaired', 'Close', {
       duration: 4000,
     });
     console.log(error);

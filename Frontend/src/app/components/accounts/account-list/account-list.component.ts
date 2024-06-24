@@ -3,17 +3,17 @@ import { Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Account } from 'src/app/models/account'; // Update the import path
+import { Account } from 'src/app/models/account';
 import { AccountService } from 'src/app/services/account.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { EOperationType } from '../../../constants/enums/e-operation-type';
 import { OperationService } from '../../../services/operation.service';
-import { map } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar'; // Update the import path
+import { map, catchError } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-account-list', // Update the selector
-  templateUrl: './account-list.component.html', // Update the template URL
+  selector: 'app-account-list',
+  templateUrl: './account-list.component.html',
   styleUrls: ['./account-list.component.scss'],
 })
 export class AccountListComponent implements OnInit {
@@ -41,24 +41,39 @@ export class AccountListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getAccounts();
     this.operations = this.operationService.getOperations('account');
+
+    this.isAllowed(EOperationType.LIST).subscribe((allowed) => {
+      if (!allowed) {
+        this.router.navigate(['/forbidden']);
+      } else {
+        this.getAccounts();
+      }
+    });
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {
     return this.operations.pipe(
-      map((operationTypesArray) => operationTypesArray.includes(operationType))
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
     );
   }
 
   getAccounts() {
-    this.accountService.getAccounts().subscribe((data) => {
-      // Update the service method name
-      this.dataSource = new MatTableDataSource<Account>(data);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-      this.dataSource.filterPredicate = this.createFilter();
-    });
+    this.accountService.getAccounts().subscribe(
+      (data) => {
+        this.dataSource = new MatTableDataSource<Account>(data);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        this.dataSource.filterPredicate = this.createFilter();
+      },
+      (error) => {
+        this.snackBar.open('Failed to load accounts!', 'Close', {
+          duration: 4000,
+        });
+        console.log(error);
+      }
+    );
   }
 
   createAccount(): void {
@@ -66,13 +81,12 @@ export class AccountListComponent implements OnInit {
   }
 
   modifyAccount(accountNumber: string) {
-    this.router.navigate(['/account-modify', accountNumber]); // Update the route path
+    this.router.navigate(['/account-modify', accountNumber]);
   }
 
   removeAccount(accountNumber: string) {
     this.accountService.removeAccount(accountNumber).subscribe(
-      (data) => {
-        // Update the service method name
+      () => {
         this.getAccounts();
       },
       (error) => {
@@ -85,11 +99,9 @@ export class AccountListComponent implements OnInit {
     );
   }
 
-  // TODO: fix the following patch methods:
-
   closeAccount(accountNumber: string) {
     this.accountService.closeAccount(accountNumber).subscribe(
-      (data) => {
+      () => {
         this.getAccounts();
       },
       (error) => {
@@ -103,7 +115,7 @@ export class AccountListComponent implements OnInit {
   }
 
   detailsAccount(accountNumber: string) {
-    this.router.navigate(['/account-details', accountNumber]); // Update the route path
+    this.router.navigate(['/account-details', accountNumber]);
   }
 
   applyFilter(event: Event) {

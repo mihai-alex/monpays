@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -7,10 +7,10 @@ import { AuditEntry } from 'src/app/models/audit-entry';
 import { Account } from 'src/app/models/account';
 import { AccountHistoryEntry } from 'src/app/models/account-history-entry';
 import { AccountService } from 'src/app/services/account.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { EOperationType } from '../../../constants/enums/e-operation-type';
 import { OperationService } from '../../../services/operation.service';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountPending } from 'src/app/models/account-pending';
 
@@ -19,7 +19,7 @@ import { AccountPending } from 'src/app/models/account-pending';
   templateUrl: './account-details.component.html',
   styleUrls: ['./account-details.component.scss'],
 })
-export class AccountDetailsComponent {
+export class AccountDetailsComponent implements OnInit, AfterViewInit {
   operations!: Observable<EOperationType[]>;
   account: Account = new Account();
   pendingAccount: AccountPending = new AccountPending();
@@ -67,6 +67,14 @@ export class AccountDetailsComponent {
 
     this.accountService
       .getAccountByAccountNumber(this.accountNumber, true, true, true)
+      .pipe(
+        catchError((error) => {
+          if (error.status === 400) {
+            return of(null); // Treat 400 error as if data is empty
+          }
+          return throwError(error);
+        })
+      )
       .subscribe(
         (data) => {
           if (!data) {
@@ -88,13 +96,10 @@ export class AccountDetailsComponent {
       );
   }
 
-  onRedirectToAccountList() {
-    this.router.navigate(['/account-list']);
-  }
-
   isAllowed(operationType: EOperationType): Observable<boolean> {
     return this.operations.pipe(
-      map((operationTypesArray) => operationTypesArray.includes(operationType))
+      map((operationTypesArray) => operationTypesArray.includes(operationType)),
+      catchError(() => of(false))
     );
   }
 
@@ -119,9 +124,9 @@ export class AccountDetailsComponent {
   blockAccount(accountNumber: string) {
     this.accountService.blockAccount(accountNumber).subscribe(
       (data) => {
-        this.ngOnInit(); // TODO
+        this.ngOnInit();
       },
-      this.handleAccountActionError // TODO: do it like this for all similar stuff
+      (error) => this.handleAccountActionError(error)
     );
   }
 
@@ -166,7 +171,7 @@ export class AccountDetailsComponent {
       (data) => {
         this.ngOnInit();
       },
-      (error: any) => this.handleAccountActionError(error)
+      (error) => this.handleAccountActionError(error)
     );
   }
 
@@ -175,7 +180,7 @@ export class AccountDetailsComponent {
       (data) => {
         this.ngOnInit();
       },
-      (error: any) => this.handleAccountActionError(error)
+      (error) => this.handleAccountActionError(error)
     );
   }
 
@@ -184,7 +189,7 @@ export class AccountDetailsComponent {
       (data) => {
         this.ngOnInit();
       },
-      (error: any) => this.handleAccountActionError(error)
+      (error) => this.handleAccountActionError(error)
     );
   }
 
@@ -193,11 +198,17 @@ export class AccountDetailsComponent {
       (data) => {
         this.ngOnInit();
       },
-      (error: any) => this.handleAccountActionError(error)
+      (error) => this.handleAccountActionError(error)
     );
   }
 
-  // TODO: implement REPAIR
+  repairAccount(accountNumber: string) {
+    this.router.navigate(['/account-repair', accountNumber]);
+  }
+
+  onRedirectToAccountList() {
+    this.router.navigate(['/account-list']);
+  }
 
   onCancel() {
     window.history.back();
@@ -216,11 +227,6 @@ export class AccountDetailsComponent {
       }
     );
     console.log(error);
-  }
-
-  repairAccount(accountNumber: string) {
-    // redirect to repair page:
-    this.router.navigate(['/account-repair', accountNumber]);
   }
 
   protected readonly EOperationType = EOperationType;
