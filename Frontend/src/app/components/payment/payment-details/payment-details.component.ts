@@ -63,7 +63,7 @@ export class PaymentDetailsComponent {
 
   ngOnInit(): void {
     this.paymentNumber = this.activatedRoute.snapshot.params['paymentNumber'];
-    this.operations = this.operationService.getOperations('profile');
+    this.operations = this.operationService.getOperations('payment');
 
     this.paymentService
       .getPaymentByPaymentNumber(this.paymentNumber, true, true)

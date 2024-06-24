@@ -7,11 +7,12 @@ import { AuditEntry } from 'src/app/models/audit-entry';
 import { User } from 'src/app/models/user';
 import { UserHistoryEntry } from 'src/app/models/user-history-entry';
 import { UserService } from 'src/app/services/user.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { EOperationType } from '../../../constants/enums/e-operation-type';
 import { OperationService } from '../../../services/operation.service';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { of } from 'rxjs';
 import { UserPending } from 'src/app/models/user-pending';
 
 @Component({
@@ -63,15 +64,25 @@ export class UserDetailsComponent {
 
   ngOnInit(): void {
     this.userName = this.activatedRoute.snapshot.params['userName'];
-    this.operations = this.operationService.getOperations('profile');
+    this.operations = this.operationService.getOperations('user');
 
     this.userService
       .getUserByUserName(this.userName, true, true, true)
+      .pipe(
+        catchError((error) => {
+          if (error.status === 400) {
+            return of(null); // Treat 400 error as if data is empty
+          }
+          return throwError(error);
+        })
+      )
       .subscribe((data) => {
         if (!data) {
           this.onRedirectToUserList();
           return;
         }
+
+        console.log(data);
 
         this.user = data;
         this.pendingUser = this.user.pendingEntity || new UserPending();

@@ -44,7 +44,7 @@ export class PaymentListComponent {
 
   ngOnInit(): void {
     this.getPayments();
-    this.operations = this.operationService.getOperations('profile');
+    this.operations = this.operationService.getOperations('payment');
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {

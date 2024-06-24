@@ -42,7 +42,7 @@ export class AccountListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAccounts();
-    this.operations = this.operationService.getOperations('profile');
+    this.operations = this.operationService.getOperations('account');
   }
 
   isAllowed(operationType: EOperationType): Observable<boolean> {

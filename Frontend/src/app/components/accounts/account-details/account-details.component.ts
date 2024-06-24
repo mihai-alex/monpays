@@ -63,7 +63,7 @@ export class AccountDetailsComponent {
 
   ngOnInit(): void {
     this.accountNumber = this.activatedRoute.snapshot.params['accountNumber'];
-    this.operations = this.operationService.getOperations('profile');
+    this.operations = this.operationService.getOperations('account');
 
     this.accountService
       .getAccountByAccountNumber(this.accountNumber, true, true, true)
