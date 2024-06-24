@@ -1,22 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { User } from 'src/app/models/user';
-import { UserService } from 'src/app/services/user.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Payment } from 'src/app/models/payment';
 import { PaymentService } from 'src/app/services/payment.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
+import { EOperationType } from '../../../constants/enums/e-operation-type';
+import { OperationService } from '../../../services/operation.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-payment-repair',
   templateUrl: './payment-repair.component.html',
   styleUrls: ['./payment-repair.component.scss'],
 })
-export class PaymentRepairComponent {
+export class PaymentRepairComponent implements OnInit {
   payment: Payment = new Payment();
   paymentNumber: string = '';
+  operations!: Observable<EOperationType[]>;
 
   constructor(
     private paymentService: PaymentService,
+    private operationService: OperationService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private snackBar: MatSnackBar
@@ -24,14 +28,32 @@ export class PaymentRepairComponent {
 
   ngOnInit(): void {
     this.paymentNumber = this.activatedRoute.snapshot.params['paymentNumber'];
-    this.paymentService
-      .getPaymentByPaymentNumber(this.paymentNumber, false, false)
-      .subscribe(
-        (data) => {
-          this.payment = data;
-        },
-        (error) => this.handlePaymentActionError(error)
-      );
+    this.operations = this.operationService.getOperations('payment');
+
+    this.isAllowed(EOperationType.LIST).subscribe((canList) => {
+      this.isAllowed(EOperationType.REPAIR).subscribe((canRepair) => {
+        console.log('canList: ' + canList + ' canRepair: ' + canRepair);
+
+        if (!canList || !canRepair) {
+          this.router.navigate(['/forbidden']);
+        } else {
+          this.paymentService
+            .getPaymentByPaymentNumber(this.paymentNumber, false, false)
+            .subscribe(
+              (data) => {
+                this.payment = data;
+              },
+              (error) => this.handlePaymentActionError(error)
+            );
+        }
+      });
+    });
+  }
+
+  isAllowed(operationType: EOperationType): Observable<boolean> {
+    return this.operations.pipe(
+      map((operationTypesArray) => operationTypesArray.includes(operationType))
+    );
   }
 
   onSubmit() {
@@ -50,8 +72,6 @@ export class PaymentRepairComponent {
   }
 
   onCancel() {
-    // Navigate the user to the payment-list page when cancel is clicked
-    //this.goToPaymentList();
     window.history.back();
   }
 
