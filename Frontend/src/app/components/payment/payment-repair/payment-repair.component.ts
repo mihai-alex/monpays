@@ -56,7 +56,7 @@ export class PaymentRepairComponent {
   }
 
   handlePaymentActionError(error: any) {
-    this.snackBar.open('Sir, your operation could not be executed!', 'Close', {
+    this.snackBar.open('The payment could not be repaired!', 'Close', {
       duration: 4000,
     });
     console.log(error);

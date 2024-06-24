@@ -164,9 +164,13 @@ export class UserDetailsComponent {
   }
 
   handleUserActionError(error: any) {
-    this.snackBar.open('Sir, your operation could not be executed!', 'Close', {
-      duration: 4000,
-    });
+    this.snackBar.open(
+      'The action could not be performed on the user!',
+      'Close',
+      {
+        duration: 4000,
+      }
+    );
     console.log(error);
   }
 

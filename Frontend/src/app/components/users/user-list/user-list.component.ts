@@ -82,11 +82,9 @@ export class UserListComponent implements OnInit {
         this.getUsers();
       },
       (error) => {
-        this.snackBar.open(
-          'Sir, your operation could not be executed!',
-          'Close',
-          { duration: 4000 }
-        );
+        this.snackBar.open('The user could not be removed!', 'Close', {
+          duration: 4000,
+        });
         console.log(error);
         this.getUsers();
       }

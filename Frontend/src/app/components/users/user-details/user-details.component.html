@@ -102,7 +102,7 @@
     color="primary"
     (click)="approveChanges(userName)"
   >
-    Approve changes
+    Approve
   </button>
   <button
     *ngIf="isAllowed(EOperationType.REJECT)"
@@ -110,7 +110,7 @@
     color="warn"
     (click)="rejectChanges(userName)"
   >
-    Reject changes
+    Reject
   </button>
   <button mat-button (click)="onCancel()">Go back</button>
 </div>

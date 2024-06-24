@@ -52,14 +52,14 @@ export class LoginComponent {
           if (this.authResponse.mfaEnabled) {
             this.snackBar.open(
               'Your account requires Two Factor Authentication (2FA). ' +
-                'Please scan the QR code and enter the code from the authenticator app.',
+                'Please scan the QR code and enter the verification code from the authenticator app.',
               'Close',
               { duration: 10000 }
             );
           } else {
             this.snackBar.open(
-              'Your account was just created. ' +
-                'You will also need to change your password.',
+              'First login successful! ' +
+                'Changing the password is required to continue.',
               'Close',
               { duration: 7000 }
             );
@@ -71,16 +71,20 @@ export class LoginComponent {
           }
         } else if (error.status === 403) {
           this.snackBar.open(
-            'The account is either BLOCKED or REMOVED',
+            'The account is either BLOCKED or REMOVED from the system.',
             'Close',
             {
               duration: 7000,
             }
           );
         } else {
-          this.snackBar.open('Sir, invalid username or password', 'Close', {
-            duration: 7000,
-          });
+          this.snackBar.open(
+            'The username/password specified is not valid!',
+            'Close',
+            {
+              duration: 7000,
+            }
+          );
 
           console.log(error);
         }
@@ -98,8 +102,8 @@ export class LoginComponent {
     this.userService.verifyTfaCode(verifyRequest).subscribe({
       next: (response: UserAuthenticationResponse): void => {
         this.snackBar.open(
-          'Your account was just created. ' +
-            'You will also need to change your password.',
+          'First login successful! ' +
+            'Changing the password is required to continue.',
           'Close',
           { duration: 7000 }
         );
@@ -107,7 +111,7 @@ export class LoginComponent {
         this.router.navigate([`/change-password/${username}`]); // Redirect to change-password page
       },
       error: (error: any): void => {
-        this.snackBar.open('Sir, invalid verification code', 'Close', {
+        this.snackBar.open('The verification code is not valid!', 'Close', {
           duration: 7000,
         });
         console.log(error);
@@ -124,12 +128,12 @@ export class LoginComponent {
 
     this.userService.verifyTfaCode(verifyRequest).subscribe({
       next: (response: UserAuthenticationResponse): void => {
-        this.snackBar.open('Login successful', 'Close', { duration: 5000 });
+        this.snackBar.open('Login successful!', 'Close', { duration: 5000 });
         this.userAuthService.setToken(response.accessToken as string);
         this.router.navigate(['/user']);
       },
       error: (error: any): void => {
-        this.snackBar.open('Sir, invalid verification code', 'Close', {
+        this.snackBar.open('The verification code is not valid!', 'Close', {
           duration: 7000,
         });
         console.log(error);

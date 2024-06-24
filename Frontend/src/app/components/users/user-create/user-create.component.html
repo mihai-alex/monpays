@@ -1,5 +1,23 @@
 <div class="col-md-6 offset-md-3">
   <h3>Create User</h3>
+  <div class="guidelines">
+    <p><strong>Password Requirements:</strong></p>
+    <ul>
+      <li>At least 8 characters long</li>
+      <li>Contains at least 1 lowercase letter (a-z)</li>
+      <li>Contains at least 1 uppercase letter (A-Z)</li>
+      <li>Contains at least 1 digit (0-9)</li>
+      <li>Contains at least 1 symbol (e.g., !@#$%^&*)</li>
+    </ul>
+    <p>
+      <strong>Email Address Requirements:</strong> Email address must be valid
+      (e.g., example@domain.com)
+    </p>
+    <p>
+      <strong>Phone Number Requirements:</strong> Phone number must be 10 digits
+    </p>
+  </div>
+
   <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <mat-form-field>
@@ -42,14 +60,14 @@
 
     <div class="form-group">
       <mat-form-field>
-        <mat-label>Email</mat-label>
-        <input matInput type="text" formControlName="emailAddress" />
+        <mat-label>Email Address</mat-label>
+        <input matInput type="email" formControlName="emailAddress" />
       </mat-form-field>
     </div>
 
     <div class="form-group">
       <mat-form-field>
-        <mat-label>Phone</mat-label>
+        <mat-label>Phone Number</mat-label>
         <input matInput type="text" formControlName="phoneNumber" />
       </mat-form-field>
     </div>
