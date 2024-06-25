@@ -70,6 +70,9 @@ export class BalanceListComponent implements OnInit {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
       this.dataSource.filterPredicate = this.createFilter();
+
+      // console log these:
+      console.log('Balances:', data);
     });
   }
 

@@ -3,6 +3,7 @@ package com.monpays.dtos.balance;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data
@@ -10,15 +11,15 @@ import java.sql.Timestamp;
 public class BalanceResponseDto {
     private Timestamp timestamp;
     private String accountNumber;
-    private Long availableAmount;
-    private Long pendingAmount;
-    private Long projectedAmount;
-    private Long availableCreditAmount;
+    private BigDecimal availableAmount;
+    private BigDecimal pendingAmount;
+    private BigDecimal projectedAmount;
+    private BigDecimal availableCreditAmount;
     private int availableCreditCount;
-    private Long availableDebitAmount;
+    private BigDecimal availableDebitAmount;
     private int availableDebitCount;
-    private Long pendingCreditAmount;
+    private BigDecimal pendingCreditAmount;
     private int pendingCreditCount;
-    private Long pendingDebitAmount;
+    private BigDecimal pendingDebitAmount;
     private int pendingDebitCount;
 }

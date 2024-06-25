@@ -23,7 +23,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Component
 public class AbstractDatabaseSeeder {
@@ -44,9 +48,8 @@ public class AbstractDatabaseSeeder {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractDatabaseSeeder.class);
 
-
     protected void insertSystemEntriesIfNotPresent() {
-        if(userRepository.findByUserName("system").isEmpty()) {
+        if (userRepository.findByUserName("system").isEmpty()) {
             try {
                 insertProfileSystem();
                 insertUserSystem();
@@ -57,7 +60,7 @@ public class AbstractDatabaseSeeder {
     }
 
     protected void insertProfilesIfNotPresent() {
-        if(this.profileRepository.count() <= 1) {
+        if (this.profileRepository.count() <= 1) {
             try {
                 insertProfileAdministratorSuper();
                 insertProfileEmployeeSuper();
@@ -70,7 +73,7 @@ public class AbstractDatabaseSeeder {
     }
 
     protected void insertUsersIfNotPresent() {
-        if(this.userRepository.count() <= 1) {
+        if (this.userRepository.count() <= 1) {
             try {
                 insertUser("a1", "super administrator");
                 insertUser("a2", "super administrator");
@@ -88,10 +91,10 @@ public class AbstractDatabaseSeeder {
     }
 
     protected void insertAccountsIfNotPresent() {
-        if(this.accountRepository.count() <= 0) {
+        if (this.accountRepository.count() <= 0) {
             try {
                 insertAccount("c1", "c1_account1");
-                spawnMoneyInAccount("c1", "c1_account1", 1000000L);
+                spawnMoneyInAccount("c1", "c1_account1", BigDecimal.valueOf(1000000L));
                 insertAccount("c1", "c1_account2");
                 insertAccount("c2", "c2_account1");
                 insertAccount("c2", "c2_account2");
@@ -100,7 +103,7 @@ public class AbstractDatabaseSeeder {
                 insertAccount("c4", "c4_account1");
                 insertAccount("c4", "c4_account2");
                 insertAccount("a1", "a1_account1");
-                spawnMoneyInAccount("a1", "a1_account1", 1000000L);
+                spawnMoneyInAccount("a1", "a1_account1", BigDecimal.valueOf(1000000L));
                 insertAccount("a2", "a1_account2");
             } catch (NoSuchElementException | InterruptedException e) {
                 logger.error("Error while inserting accounts: {}", e.getMessage(), e);
@@ -216,7 +219,7 @@ public class AbstractDatabaseSeeder {
         accountRequestDto.setOwner(ownerName);
         accountRequestDto.setCurrency("EUR");
         accountRequestDto.setName(accountName);
-        accountRequestDto.setTransactionLimit(100000L);
+        accountRequestDto.setTransactionLimit(new BigDecimal("100000"));
         accountController.create("a1", accountRequestDto);
     }
 
@@ -231,7 +234,7 @@ public class AbstractDatabaseSeeder {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private void spawnMoneyInAccount(String ownerName, String accountName, Long amount) throws NoSuchElementException, InterruptedException {
+    private void spawnMoneyInAccount(String ownerName, String accountName, BigDecimal amount) throws NoSuchElementException, InterruptedException {
         Account account = accountRepository.findAll()
                 .stream()
                 .filter(account1 -> Objects.equals(account1.getOwner().getUserName(), ownerName) &&

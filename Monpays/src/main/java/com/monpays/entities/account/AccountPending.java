@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "pending_accounts")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -35,7 +37,7 @@ public class AccountPending {
     private String name;
 
     @Column
-    private Long transactionLimit;
+    private BigDecimal transactionLimit;
 
     @Column
     @Enumerated(EnumType.STRING)
