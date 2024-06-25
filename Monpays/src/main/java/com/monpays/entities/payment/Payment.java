@@ -46,4 +46,7 @@ public class Payment {
     private EPaymentType type;
     @Column
     private EPaymentStatus status;
+
+    @Column
+    private Long convertedAmount; // Persisted in the database
 }

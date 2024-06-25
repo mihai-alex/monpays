@@ -198,7 +198,7 @@ public class PaymentService implements IPaymentService {
                 payment.getCreditAccount().getCurrency().getCode()
         );
 
-        payment.setAmount(convertedAmount.longValue());
+        payment.setConvertedAmount(convertedAmount.longValue());
 
         String newPaymentNumber = AccountNumberGenerator.generateUniqueAccountNumber(accountRepository);
         payment.setNumber(newPaymentNumber);
@@ -241,7 +241,7 @@ public class PaymentService implements IPaymentService {
                 repairPayment.getCreditAccount().getCurrency().getCode()
         );
 
-        repairPayment.setAmount(convertedAmount.longValue());
+        repairPayment.setConvertedAmount(convertedAmount.longValue());
 
         internalUpdatePayment(payment, repairPayment);
         payment.setStatus(EPaymentStatus.REPAIRED);
