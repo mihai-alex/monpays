@@ -1,4 +1,7 @@
 export enum ECurrencyType {
-  USD = 'USD',
   EUR = 'EUR',
+  GBP = 'GBP',
+  CHF = 'CHF',
+  USD = 'USD',
+  RON = 'RON',
 }

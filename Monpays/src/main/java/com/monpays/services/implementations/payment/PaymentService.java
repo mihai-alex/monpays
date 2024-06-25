@@ -25,6 +25,7 @@ import com.monpays.services.interfaces.account.IAccountService;
 import com.monpays.services.interfaces.balance.IBalanceService;
 import com.monpays.services.interfaces.payment.IPaymentHistoryService;
 import com.monpays.services.interfaces.payment.IPaymentService;
+import com.monpays.services.interfaces._generic.ICurrencyConversionService;
 import com.monpays.utils.AccountNumberGenerator;
 import com.monpays.utils.CurrencyXmlParser;
 import com.sun.jdi.InternalException;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,8 @@ public class PaymentService implements IPaymentService {
     private AuditMapper auditMapper;
     @Autowired
     private IUserActivityService userActivityService;
+    @Autowired
+    private ICurrencyConversionService currencyConversionService;
 
     @Override
     public PaymentResponseDto getOne(String username, String paymentNumber, boolean needsHistory, boolean needsAudit) {
@@ -91,17 +95,17 @@ public class PaymentService implements IPaymentService {
 
             // TODO: user mapper
             paymentHistoryEntries.forEach(paymentHistoryEntry -> {
-                    PaymentHistoryEntryDto paymentHistoryEntryDto = new PaymentHistoryEntryDto();
-                    paymentHistoryEntryDto.setNumber(paymentHistoryEntry.getNumber());
-                    paymentHistoryEntryDto.setTimestamp(paymentHistoryEntry.getTimestamp());
-                    paymentHistoryEntryDto.setCurrency(paymentHistoryEntry.getCurrency().getCode());
-                    paymentHistoryEntryDto.setAmount(paymentHistoryEntry.getAmount());
-                    paymentHistoryEntryDto.setDebitAccount(paymentHistoryEntry.getDebitAccount().getAccountNumber());
-                    paymentHistoryEntryDto.setCreditAccount(paymentHistoryEntry.getCreditAccount().getAccountNumber());
-                    paymentHistoryEntryDto.setDescription(paymentHistoryEntry.getDescription());
-                    paymentHistoryEntryDto.setType(paymentHistoryEntry.getType());
-                    paymentHistoryEntryDto.setStatus(paymentHistoryEntry.getStatus());
-                    paymentHistoryEntryDtos.add(paymentHistoryEntryDto);
+                PaymentHistoryEntryDto paymentHistoryEntryDto = new PaymentHistoryEntryDto();
+                paymentHistoryEntryDto.setNumber(paymentHistoryEntry.getNumber());
+                paymentHistoryEntryDto.setTimestamp(paymentHistoryEntry.getTimestamp());
+                paymentHistoryEntryDto.setCurrency(paymentHistoryEntry.getCurrency().getCode());
+                paymentHistoryEntryDto.setAmount(paymentHistoryEntry.getAmount());
+                paymentHistoryEntryDto.setDebitAccount(paymentHistoryEntry.getDebitAccount().getAccountNumber());
+                paymentHistoryEntryDto.setCreditAccount(paymentHistoryEntry.getCreditAccount().getAccountNumber());
+                paymentHistoryEntryDto.setDescription(paymentHistoryEntry.getDescription());
+                paymentHistoryEntryDto.setType(paymentHistoryEntry.getType());
+                paymentHistoryEntryDto.setStatus(paymentHistoryEntry.getStatus());
+                paymentHistoryEntryDtos.add(paymentHistoryEntryDto);
             });
             paymentResponseDto.setHistory(paymentHistoryEntryDtos);
         }
@@ -130,9 +134,6 @@ public class PaymentService implements IPaymentService {
         if(!actor.hasRight(operation)) {
             throw new ServiceException("Sir, you don't have the right to view all payments.");
         }
-//        if(actor.getProfile().getType() == EProfileType.CUSTOMER) {
-//            throw new ServiceException("Sir, you don't have the right to view all payments.");
-//        }
 
         auditService.add(actor, operation, null);
         return paymentRepository.findAll()
@@ -190,6 +191,15 @@ public class PaymentService implements IPaymentService {
             throw new ServiceException("Sir, payment number already exists.");
         }
 
+        // Currency conversion
+        BigDecimal convertedAmount = currencyConversionService.convert(
+                BigDecimal.valueOf(payment.getAmount()),
+                payment.getDebitAccount().getCurrency().getCode(),
+                payment.getCreditAccount().getCurrency().getCode()
+        );
+
+        payment.setAmount(convertedAmount.longValue());
+
         String newPaymentNumber = AccountNumberGenerator.generateUniqueAccountNumber(accountRepository);
         payment.setNumber(newPaymentNumber);
         payment.setTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -223,6 +233,15 @@ public class PaymentService implements IPaymentService {
         if(payment.getStatus() != EPaymentStatus.IN_REPAIR) {
             throw new ServiceException("Sir, the payment is not in a state that can be repaired.");
         }
+
+        // Currency conversion
+        BigDecimal convertedAmount = currencyConversionService.convert(
+                BigDecimal.valueOf(repairPayment.getAmount()),
+                repairPayment.getDebitAccount().getCurrency().getCode(),
+                repairPayment.getCreditAccount().getCurrency().getCode()
+        );
+
+        repairPayment.setAmount(convertedAmount.longValue());
 
         internalUpdatePayment(payment, repairPayment);
         payment.setStatus(EPaymentStatus.REPAIRED);
@@ -397,7 +416,6 @@ public class PaymentService implements IPaymentService {
         auditService.add(actor, operation, paymentNumber);
         return true;
     }
-
 
     private boolean internalNeedsVerification(Payment payment) {
         return payment.getAmount() > payment.getDebitAccount().getTransactionLimit();
