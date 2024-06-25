@@ -27,6 +27,8 @@ public interface PaymentMapper {
     @Mapping(target = "description", source = "paymentRequestDto.description")
     @Mapping(target = "type", expression = "java(getInternalPaymentType())")
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "debitAmount", ignore = true)
+    @Mapping(target = "creditAmount", ignore = true)
     Payment toPayment(PaymentRequestDto paymentRequestDto, IAccountRepository accountRepository, CurrencyXmlParser currencyXmlParser);
 
 
