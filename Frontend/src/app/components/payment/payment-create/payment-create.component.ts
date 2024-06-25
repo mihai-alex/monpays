@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ProfileService } from 'src/app/services/profile.service';
+import { ProfileService } from 'src/app/services/profile.service'; // Import the profile service
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Payment } from 'src/app/models/payment';
+import { ECurrencyType } from 'src/app/constants/enums/e-currency-type';
 import { PaymentService } from 'src/app/services/payment.service';
-import { AccountService } from 'src/app/services/account.service';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { EOperationType } from '../../../constants/enums/e-operation-type';
 import { OperationService } from '../../../services/operation.service';
-import { map, catchError } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-payment-create',
@@ -17,21 +17,21 @@ import { map, catchError } from 'rxjs/operators';
   styleUrls: ['./payment-create.component.scss'],
 })
 export class PaymentCreateComponent implements OnInit {
-  paymentForm!: FormGroup;
-  payment: Payment = new Payment();
-  profileNames: string[] = [];
+  paymentForm!: FormGroup; // Use FormGroup for the form
+  payment: Payment = new Payment(); // Initialize a new payment
+  profileNames: string[] = []; // Initialize an array to store profile names
+  currencyTypes = Object.values(ECurrencyType); // Use ECurrencyType enum values for dropdown
   operations!: Observable<EOperationType[]>;
 
   constructor(
     private paymentService: PaymentService,
-    private profileService: ProfileService,
-    private accountService: AccountService,
+    private profileService: ProfileService, // Inject the profile service
     private operationService: OperationService,
     private router: Router,
-    private formBuilder: FormBuilder,
+    private formBuilder: FormBuilder, // Inject FormBuilder
     private snackBar: MatSnackBar
   ) {
-    this.initForm();
+    this.initForm(); // Ensure the form is initialized in the constructor
   }
 
   ngOnInit(): void {
@@ -42,7 +42,7 @@ export class PaymentCreateComponent implements OnInit {
         if (!canList || !canCreate) {
           this.router.navigate(['/forbidden']);
         } else {
-          this.fetchProfileNames();
+          this.fetchProfileNames(); // Fetch profile names when component initializes
         }
       });
     });
@@ -56,6 +56,7 @@ export class PaymentCreateComponent implements OnInit {
 
   initForm() {
     this.paymentForm = this.formBuilder.group({
+      currency: ['', Validators.required],
       amount: ['', Validators.required],
       debitAccountNumber: ['', Validators.required],
       creditAccountNumber: ['', Validators.required],
@@ -78,31 +79,13 @@ export class PaymentCreateComponent implements OnInit {
     if (this.paymentForm.valid) {
       const formValue = this.paymentForm.value;
 
+      this.payment.currency = formValue.currency;
       this.payment.amount = formValue.amount;
       this.payment.debitAccountNumber = formValue.debitAccountNumber;
       this.payment.creditAccountNumber = formValue.creditAccountNumber;
       this.payment.description = formValue.description;
 
-      // Fetch the currency of the credit account before creating the payment
-      this.accountService
-        .getAccountByAccountNumber(this.payment.creditAccountNumber)
-        .pipe(
-          catchError((error) => {
-            this.snackBar.open('Error fetching account currency!', 'Close', {
-              duration: 4000,
-            });
-            return throwError(error);
-          })
-        )
-        .subscribe(
-          (account) => {
-            this.payment.currency = account.currency; // Set the currency from the credit account
-            this.createPayment();
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
+      this.createPayment();
     } else {
       this.snackBar.open('Please fill out the form correctly!', 'Close', {
         duration: 4000,

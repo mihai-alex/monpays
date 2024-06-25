@@ -32,7 +32,14 @@ public class Payment {
 
     @Positive
     @Column
-    private Long amount;
+    private Long amount; // Requested amount in payment currency
+    @Positive
+    @Column
+    private Long debitAmount; // Amount to be debited from debit account
+    @Positive
+    @Column
+    private Long creditAmount; // Amount to be credited to credit account
+
     // the money is transferred FROM this account
     @ManyToOne
     private Account debitAccount;
@@ -46,7 +53,4 @@ public class Payment {
     private EPaymentType type;
     @Column
     private EPaymentStatus status;
-
-    @Column
-    private Long convertedAmount; // Persisted in the database
 }

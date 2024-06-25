@@ -83,7 +83,7 @@ public class BalanceService implements IBalanceService {
         Balance debitBalance = balances.getFirst();
         Balance creditBalance = balances.getSecond();
 
-        internalAddSentAmountIntoPending(payment.getAmount(), payment.getConvertedAmount(), debitBalance, creditBalance);
+        internalAddSentAmountIntoPending(payment.getDebitAmount(), payment.getCreditAmount(), debitBalance, creditBalance);
 
         balanceRepository.save(debitBalance);
         balanceRepository.save(creditBalance);
@@ -95,8 +95,8 @@ public class BalanceService implements IBalanceService {
         Balance debitBalance = balances.getFirst();
         Balance creditBalance = balances.getSecond();
 
-        internalRemoveSentAmountFromPending(payment.getAmount(), payment.getConvertedAmount(), debitBalance, creditBalance);
-        internalAddSentAmountIntoAvailable(payment.getAmount(), payment.getConvertedAmount(), debitBalance, creditBalance);
+        internalRemoveSentAmountFromPending(payment.getDebitAmount(), payment.getCreditAmount(), debitBalance, creditBalance);
+        internalAddSentAmountIntoAvailable(payment.getDebitAmount(), payment.getCreditAmount(), debitBalance, creditBalance);
 
         balanceRepository.save(debitBalance);
         balanceRepository.save(creditBalance);
@@ -108,7 +108,7 @@ public class BalanceService implements IBalanceService {
         Balance debitBalance = balances.getFirst();
         Balance creditBalance = balances.getSecond();
 
-        internalRemoveSentAmountFromPending(payment.getAmount(), payment.getConvertedAmount(), debitBalance, creditBalance);
+        internalRemoveSentAmountFromPending(payment.getDebitAmount(), payment.getCreditAmount(), debitBalance, creditBalance);
 
         balanceRepository.save(debitBalance);
         balanceRepository.save(creditBalance);

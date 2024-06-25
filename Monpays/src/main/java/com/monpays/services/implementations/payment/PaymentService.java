@@ -93,7 +93,6 @@ public class PaymentService implements IPaymentService {
             List<PaymentHistoryEntryDto> paymentHistoryEntryDtos = new ArrayList<>();
             List<PaymentHistoryEntry> paymentHistoryEntries = paymentHistoryService.getByObject(payment);
 
-            // TODO: user mapper
             paymentHistoryEntries.forEach(paymentHistoryEntry -> {
                 PaymentHistoryEntryDto paymentHistoryEntryDto = new PaymentHistoryEntryDto();
                 paymentHistoryEntryDto.setNumber(paymentHistoryEntry.getNumber());
@@ -192,13 +191,20 @@ public class PaymentService implements IPaymentService {
         }
 
         // Currency conversion
-        BigDecimal convertedAmount = currencyConversionService.convert(
+        BigDecimal debitAmount = currencyConversionService.convert(
                 BigDecimal.valueOf(payment.getAmount()),
-                payment.getDebitAccount().getCurrency().getCode(),
+                payment.getCurrency().getCode(),
+                payment.getDebitAccount().getCurrency().getCode()
+        );
+
+        BigDecimal creditAmount = currencyConversionService.convert(
+                BigDecimal.valueOf(payment.getAmount()),
+                payment.getCurrency().getCode(),
                 payment.getCreditAccount().getCurrency().getCode()
         );
 
-        payment.setConvertedAmount(convertedAmount.longValue());
+        payment.setDebitAmount(debitAmount.longValue());
+        payment.setCreditAmount(creditAmount.longValue());
 
         String newPaymentNumber = AccountNumberGenerator.generateUniqueAccountNumber(accountRepository);
         payment.setNumber(newPaymentNumber);
@@ -235,13 +241,20 @@ public class PaymentService implements IPaymentService {
         }
 
         // Currency conversion
-        BigDecimal convertedAmount = currencyConversionService.convert(
+        BigDecimal debitAmount = currencyConversionService.convert(
                 BigDecimal.valueOf(repairPayment.getAmount()),
-                repairPayment.getDebitAccount().getCurrency().getCode(),
+                repairPayment.getCurrency().getCode(),
+                repairPayment.getDebitAccount().getCurrency().getCode()
+        );
+
+        BigDecimal creditAmount = currencyConversionService.convert(
+                BigDecimal.valueOf(repairPayment.getAmount()),
+                repairPayment.getCurrency().getCode(),
                 repairPayment.getCreditAccount().getCurrency().getCode()
         );
 
-        repairPayment.setConvertedAmount(convertedAmount.longValue());
+        repairPayment.setDebitAmount(debitAmount.longValue());
+        repairPayment.setCreditAmount(creditAmount.longValue());
 
         internalUpdatePayment(payment, repairPayment);
         payment.setStatus(EPaymentStatus.REPAIRED);

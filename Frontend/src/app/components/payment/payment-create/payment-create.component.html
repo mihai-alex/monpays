@@ -1,6 +1,28 @@
 <div class="col-md-6 offset-md-3">
   <h3>Create Payment</h3>
   <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+    <!-- this.paymentForm = this.formBuilder.group({
+            currency: ['', Validators.required],
+            amount: ['', Validators.required],
+            debitAccountNumber: ['', Validators.required],
+            creditAccountNumber: ['', Validators.required],
+            description: ['', Validators.required],
+          }); -->
+
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>Currency</mat-label>
+        <mat-select formControlName="currency">
+          <mat-option
+            *ngFor="let currencyCode of currencyTypes"
+            [value]="currencyCode"
+          >
+            {{ currencyCode }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
     <div class="form-group">
       <mat-form-field>
         <mat-label>Amount</mat-label>
