@@ -76,20 +76,20 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "getOne", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.LIST, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("Sir, you don't have the right to view all payments.");
         }
 
         auditService.add(actor, operation, null);
 
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElse(null);
-        if(payment == null) {
+        if (payment == null) {
             return null;
         }
         auditService.add(actor, operation, paymentNumber);
 
         PaymentResponseDto paymentResponseDto = paymentMapper.fromPayment(payment);
-        if(needsHistory) {
+        if (needsHistory) {
             List<PaymentHistoryEntryDto> paymentHistoryEntryDtos = new ArrayList<>();
             List<PaymentHistoryEntry> paymentHistoryEntries = paymentHistoryService.getByObject(payment);
 
@@ -110,7 +110,7 @@ public class PaymentService implements IPaymentService {
             paymentResponseDto.setHistory(paymentHistoryEntryDtos);
         }
 
-        if(needsAudit) {
+        if (needsAudit) {
             List<AuditEntryDto> auditEntryDtos = new ArrayList<>();
             List<AuditEntry> auditEntries = auditService.getByObject(Payment.class.getSimpleName(), payment.getNumber());
 
@@ -131,7 +131,7 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "listAll", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.LIST, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("Sir, you don't have the right to view all payments.");
         }
 
@@ -149,7 +149,7 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "listAllByAccount", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.LIST, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("Sir, you don't have the right to view all payments.");
         }
 
@@ -172,22 +172,22 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "create", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.CREATE, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
         Payment payment = paymentMapper.toPayment(paymentRequestDto, accountRepository, currencyXmlParser);
 
-        if(!Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
+        if (!Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
             throw new ServiceException("Sir, your transaction is illegal.");
         }
-        if(!payment.getDebitAccount().hasRight(EAccountOperation.SEND)) {
+        if (!payment.getDebitAccount().hasRight(EAccountOperation.SEND)) {
             throw new ServiceException("Sir, your account is not allowed to send money.");
         }
-        if(!payment.getCreditAccount().hasRight(EAccountOperation.RECEIVE)) {
+        if (!payment.getCreditAccount().hasRight(EAccountOperation.RECEIVE)) {
             throw new ServiceException("Sir, the account you are trying to send money to is not allowed to receive money.");
         }
-        if(paymentRepository.findByNumber(payment.getNumber()).isPresent()) {
+        if (paymentRepository.findByNumber(payment.getNumber()).isPresent()) {
             throw new ServiceException("Sir, payment number already exists.");
         }
 
@@ -220,17 +220,17 @@ public class PaymentService implements IPaymentService {
 
         Payment repairPayment = paymentMapper.toPayment(paymentRequestDto, accountRepository, currencyXmlParser);
 
-        if(paymentRepository.findByNumber(repairPayment.getNumber()).isEmpty()) {
+        if (paymentRepository.findByNumber(repairPayment.getNumber()).isEmpty()) {
             throw new ServiceException("Sir, the account number does not exists.");
         }
 
         Operation operation = new Operation(EOperationType.REPAIR, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
-        if(payment.getStatus() != EPaymentStatus.IN_REPAIR) {
+        if (payment.getStatus() != EPaymentStatus.IN_REPAIR) {
             throw new ServiceException("Sir, the payment is not in a state that can be repaired.");
         }
 
@@ -260,30 +260,28 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "approve", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.APPROVE, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
 
-        if(Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
+        if (Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
             throw new ServiceException("Sir, you cannot approve your own payment.");
         }
-        if(Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
+        if (Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
             throw new ServiceException("Sir, you cannot approve payments directed to you.");
         }
-        if(payment.getStatus() != EPaymentStatus.CREATED && payment.getStatus() != EPaymentStatus.REPAIRED) {
+        if (payment.getStatus() != EPaymentStatus.CREATED && payment.getStatus() != EPaymentStatus.REPAIRED) {
             throw new ServiceException("Sir, the payment is not in a state that can be approved.");
         }
 
         internalHaltPayment(payment);
-        if(internalNeedsVerification(payment)) {
+        if (internalNeedsVerification(payment)) {
             payment.setStatus(EPaymentStatus.WAITING_VERIFICATION);
-        }
-        else if(internalNeedsAuthorization(payment)) {
+        } else if (internalNeedsAuthorization(payment)) {
             payment.setStatus(EPaymentStatus.WAITING_AUTHORIZATION);
-        }
-        else {
+        } else {
             internalCompletePayment(payment);
         }
         paymentRepository.save(payment);
@@ -300,26 +298,25 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "verify", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.VERIFY, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
 
-        if(Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
+        if (Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
             throw new ServiceException("Sir, you cannot verify your own payment.");
         }
-        if(Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
+        if (Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
             throw new ServiceException("Sir, you cannot verify payments directed to you.");
         }
-        if(payment.getStatus() != EPaymentStatus.WAITING_VERIFICATION) {
+        if (payment.getStatus() != EPaymentStatus.WAITING_VERIFICATION) {
             throw new ServiceException("Sir, the payment is not in a state that can be verified.");
         }
 
-        if(internalNeedsAuthorization(payment)) {
+        if (internalNeedsAuthorization(payment)) {
             payment.setStatus(EPaymentStatus.WAITING_AUTHORIZATION);
-        }
-        else {
+        } else {
             internalCompletePayment(payment);
         }
         paymentRepository.save(payment);
@@ -336,19 +333,19 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "authorize", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.AUTHORIZE, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
 
-        if(Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
+        if (Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
             throw new ServiceException("Sir, you cannot authorize your own payment.");
         }
-        if(Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
+        if (Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
             throw new ServiceException("Sir, you cannot authorize payments directed to you.");
         }
-        if(payment.getStatus() != EPaymentStatus.WAITING_AUTHORIZATION) {
+        if (payment.getStatus() != EPaymentStatus.WAITING_AUTHORIZATION) {
             throw new ServiceException("Sir, the payment is not in a state that can be authorize.");
         }
 
@@ -367,11 +364,11 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "reject", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.REJECT, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("Unauthorized");
         }
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
-        if(Objects.equals(payment.getDebitAccount().getOwner().getUserName(), actor.getUserName())) {
+        if (Objects.equals(payment.getDebitAccount().getOwner().getUserName(), actor.getUserName())) {
             throw new ServiceException("Sir, you cannot reject your own payment.");
         }
 
@@ -395,12 +392,12 @@ public class PaymentService implements IPaymentService {
         userActivityService.add(actor, "cancel", Payment.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.CLOSE, Payment.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
-        if(!Objects.equals(payment.getDebitAccount().getOwner().getUserName(), actor.getUserName())) {
+        if (!Objects.equals(payment.getDebitAccount().getOwner().getUserName(), actor.getUserName())) {
             throw new ServiceException("Sir, you cannot cancel a payment that is not yours.");
         }
 
@@ -456,12 +453,11 @@ public class PaymentService implements IPaymentService {
         try {
             for (Field field : Payment.class.getDeclaredFields()) {
                 field.setAccessible(true);
-                if(field.get(patchPayment) != null) {
+                if (field.get(patchPayment) != null) {
                     field.set(originalPayment, field.get(patchPayment));
                 }
             }
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
             throw new InternalException("Internal Server Error");
         }
     }

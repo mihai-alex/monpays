@@ -57,7 +57,7 @@ public class BalanceService implements IBalanceService {
         userActivityService.add(actor, "listAllByAccount", Balance.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.LIST, Balance.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("You don't have the right to list balances");
         }
 
@@ -83,7 +83,7 @@ public class BalanceService implements IBalanceService {
         Balance debitBalance = balances.getFirst();
         Balance creditBalance = balances.getSecond();
 
-        internalAddSentAmountIntoPending(payment.getConvertedAmount(), debitBalance, creditBalance);
+        internalAddSentAmountIntoPending(payment.getAmount(), payment.getConvertedAmount(), debitBalance, creditBalance);
 
         balanceRepository.save(debitBalance);
         balanceRepository.save(creditBalance);
@@ -95,8 +95,8 @@ public class BalanceService implements IBalanceService {
         Balance debitBalance = balances.getFirst();
         Balance creditBalance = balances.getSecond();
 
-        internalRemoveSentAmountFromPending(payment.getConvertedAmount(), debitBalance, creditBalance);
-        internalAddSentAmountIntoAvailable(payment.getConvertedAmount(), debitBalance, creditBalance);
+        internalRemoveSentAmountFromPending(payment.getAmount(), payment.getConvertedAmount(), debitBalance, creditBalance);
+        internalAddSentAmountIntoAvailable(payment.getAmount(), payment.getConvertedAmount(), debitBalance, creditBalance);
 
         balanceRepository.save(debitBalance);
         balanceRepository.save(creditBalance);
@@ -108,7 +108,7 @@ public class BalanceService implements IBalanceService {
         Balance debitBalance = balances.getFirst();
         Balance creditBalance = balances.getSecond();
 
-        internalRemoveSentAmountFromPending(payment.getConvertedAmount(), debitBalance, creditBalance);
+        internalRemoveSentAmountFromPending(payment.getAmount(), payment.getConvertedAmount(), debitBalance, creditBalance);
 
         balanceRepository.save(debitBalance);
         balanceRepository.save(creditBalance);
@@ -125,18 +125,18 @@ public class BalanceService implements IBalanceService {
     }
 
     // money is sent from the debit balance to the credit balance
-    private void internalAddSentAmountIntoPending(Long sentAmount, Balance debitBalance, Balance creditBalance) {
-        debitBalance.sendAmountPending(sentAmount);
-        creditBalance.receiveAmountPending(sentAmount);
+    private void internalAddSentAmountIntoPending(Long debitAmount, Long creditAmount, Balance debitBalance, Balance creditBalance) {
+        debitBalance.sendAmountPending(debitAmount);
+        creditBalance.receiveAmountPending(creditAmount);
     }
 
-    private void internalRemoveSentAmountFromPending(Long amount, Balance debitBalance, Balance creditBalance) {
-        debitBalance.removeSentAmountPending(amount);
-        creditBalance.removeReceivedAmountPending(amount);
+    private void internalRemoveSentAmountFromPending(Long debitAmount, Long creditAmount, Balance debitBalance, Balance creditBalance) {
+        debitBalance.removeSentAmountPending(debitAmount);
+        creditBalance.removeReceivedAmountPending(creditAmount);
     }
 
-    private void internalAddSentAmountIntoAvailable(Long amount, Balance debitBalance, Balance creditBalance) {
-        debitBalance.sendAmountAvailable(amount);
-        creditBalance.receiveAmountAvailable(amount);
+    private void internalAddSentAmountIntoAvailable(Long debitAmount, Long creditAmount, Balance debitBalance, Balance creditBalance) {
+        debitBalance.sendAmountAvailable(debitAmount);
+        creditBalance.receiveAmountAvailable(creditAmount);
     }
 }
