@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
@@ -22,6 +23,7 @@ public class AccountHistoryEntry extends AbstractHistoryEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     protected Long id;
+
     @Column(nullable = false)
     @NotBlank
     private String accountNumber;
@@ -36,7 +38,7 @@ public class AccountHistoryEntry extends AbstractHistoryEntry {
     private String name;
 
     @Column
-    private Long transactionLimit;
+    private BigDecimal transactionLimit;
 
     @Column
     @Enumerated(EnumType.STRING)

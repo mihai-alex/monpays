@@ -6,6 +6,8 @@ import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.Version;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class AccountRequestDto {
     /*
@@ -22,7 +24,7 @@ public class AccountRequestDto {
 
     private String name;
 
-    private Long transactionLimit;
+    private BigDecimal transactionLimit;
 
     @Nullable
     private EAccountStatus status;

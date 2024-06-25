@@ -191,20 +191,22 @@ public class PaymentService implements IPaymentService {
         }
 
         // Currency conversion
+        int fractionDigits = currencyXmlParser.getFractionDigits(payment.getCurrency().getCode());
+
         BigDecimal debitAmount = currencyConversionService.convert(
-                BigDecimal.valueOf(payment.getAmount()),
+                payment.getAmount(),
                 payment.getCurrency().getCode(),
                 payment.getDebitAccount().getCurrency().getCode()
         );
 
         BigDecimal creditAmount = currencyConversionService.convert(
-                BigDecimal.valueOf(payment.getAmount()),
+                payment.getAmount(),
                 payment.getCurrency().getCode(),
                 payment.getCreditAccount().getCurrency().getCode()
         );
 
-        payment.setDebitAmount(debitAmount.longValue());
-        payment.setCreditAmount(creditAmount.longValue());
+        payment.setDebitAmount(debitAmount);
+        payment.setCreditAmount(creditAmount);
 
         String newPaymentNumber = AccountNumberGenerator.generateUniqueAccountNumber(accountRepository);
         payment.setNumber(newPaymentNumber);
@@ -227,7 +229,7 @@ public class PaymentService implements IPaymentService {
         Payment repairPayment = paymentMapper.toPayment(paymentRequestDto, accountRepository, currencyXmlParser);
 
         if (paymentRepository.findByNumber(repairPayment.getNumber()).isEmpty()) {
-            throw new ServiceException("Sir, the account number does not exists.");
+            throw new ServiceException("Sir, the account number does not exist.");
         }
 
         Operation operation = new Operation(EOperationType.REPAIR, Payment.class.getSimpleName());
@@ -241,20 +243,22 @@ public class PaymentService implements IPaymentService {
         }
 
         // Currency conversion
+        int fractionDigits = currencyXmlParser.getFractionDigits(repairPayment.getCurrency().getCode());
+
         BigDecimal debitAmount = currencyConversionService.convert(
-                BigDecimal.valueOf(repairPayment.getAmount()),
+                repairPayment.getAmount(),
                 repairPayment.getCurrency().getCode(),
                 repairPayment.getDebitAccount().getCurrency().getCode()
         );
 
         BigDecimal creditAmount = currencyConversionService.convert(
-                BigDecimal.valueOf(repairPayment.getAmount()),
+                repairPayment.getAmount(),
                 repairPayment.getCurrency().getCode(),
                 repairPayment.getCreditAccount().getCurrency().getCode()
         );
 
-        repairPayment.setDebitAmount(debitAmount.longValue());
-        repairPayment.setCreditAmount(creditAmount.longValue());
+        repairPayment.setDebitAmount(debitAmount);
+        repairPayment.setCreditAmount(creditAmount);
 
         internalUpdatePayment(payment, repairPayment);
         payment.setStatus(EPaymentStatus.REPAIRED);
@@ -359,7 +363,7 @@ public class PaymentService implements IPaymentService {
             throw new ServiceException("Sir, you cannot authorize payments directed to you.");
         }
         if (payment.getStatus() != EPaymentStatus.WAITING_AUTHORIZATION) {
-            throw new ServiceException("Sir, the payment is not in a state that can be authorize.");
+            throw new ServiceException("Sir, the payment is not in a state that can be authorized.");
         }
 
         internalCompletePayment(payment);
@@ -417,7 +421,7 @@ public class PaymentService implements IPaymentService {
         switch (payment.getStatus().name().toLowerCase()) {
             case "created", "in_repair", "repaired" -> internalCancelPaymentNoHalt(payment);
             case "waiting_verification", "waiting_authorization" -> internalCancelPayment(payment);
-            default -> throw new ServiceException("Sir, the payment is not in a state that can be cancelled.");
+            default -> throw new ServiceException("Sir, the payment is not in a state that can be canceled.");
         }
 
         payment = paymentRepository.save(payment);
@@ -428,14 +432,15 @@ public class PaymentService implements IPaymentService {
     }
 
     private boolean internalNeedsVerification(Payment payment) {
-        return payment.getAmount() > payment.getDebitAccount().getTransactionLimit();
+        return payment.getAmount().compareTo(payment.getDebitAccount().getTransactionLimit()) > 0;
     }
 
+
     private boolean internalNeedsAuthorization(Payment payment) {
-        Long debitAccountWorkingBalance =
+        BigDecimal debitAccountWorkingBalance =
                 balanceService.classifiedGetCurrentBalance(payment.getDebitAccount())
                         .getAvailableAmount();
-        return payment.getAmount() > debitAccountWorkingBalance;
+        return payment.getAmount().compareTo(debitAccountWorkingBalance) > 0;
     }
 
     private void internalCancelPaymentNoHalt(Payment payment) {
@@ -450,13 +455,11 @@ public class PaymentService implements IPaymentService {
         balanceService.classifiedHaltPayment(payment);
     }
 
-    // the payment MUST HAVE BEEN HALTED before calling this method
     private void internalCompletePayment(Payment payment) {
         payment.setStatus(EPaymentStatus.COMPLETED);
         balanceService.classifiedCompletePayment(payment);
     }
 
-    // the payment MUST HAVE BEEN HALTED before calling this method
     private void internalCancelPayment(Payment payment) {
         payment.setStatus(EPaymentStatus.CANCELLED);
         balanceService.classifiedCancelPayment(payment);

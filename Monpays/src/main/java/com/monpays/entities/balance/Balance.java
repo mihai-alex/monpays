@@ -4,6 +4,7 @@ import com.monpays.entities.account.Account;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
@@ -21,20 +22,20 @@ public class Balance {
     private Account account;
     // money THAT HE HAS RECEIVED
     @Column
-    private Long availableCreditAmount;
+    private BigDecimal availableCreditAmount;
     @Column
     private int availableCreditCount;
     // money THAT HE HAS SENT
     @Column
-    private Long availableDebitAmount;
+    private BigDecimal availableDebitAmount;
     @Column
     private int availableDebitCount;
     @Column
-    private Long pendingCreditAmount;
+    private BigDecimal pendingCreditAmount;
     @Column
     private int pendingCreditCount;
     @Column
-    private Long pendingDebitAmount;
+    private BigDecimal pendingDebitAmount;
     @Column
     private int pendingDebitCount;
 
@@ -58,70 +59,70 @@ public class Balance {
 
     // methods for getting amounts
 
-    public Long getAvailableAmount() {              // working amount
-        return availableCreditAmount - availableDebitAmount;
+    public BigDecimal getAvailableAmount() {              // working amount
+        return availableCreditAmount.subtract(availableDebitAmount);
     }
 
-    public Long getPendingAmount() {
-        return pendingCreditAmount - pendingDebitAmount;
+    public BigDecimal getPendingAmount() {
+        return pendingCreditAmount.subtract(pendingDebitAmount);
     }
 
-    public Long getProjectedAmount() {
-        return getAvailableAmount() + getPendingAmount();
+    public BigDecimal getProjectedAmount() {
+        return getAvailableAmount().add(getPendingAmount());
     }
 
     // methods for sending and receiving money
 
-    public void sendAmountPending(Long amount) throws IllegalArgumentException {
+    public void sendAmountPending(BigDecimal amount) throws IllegalArgumentException {
         internalVerifyAmount(amount);
-        pendingDebitAmount += amount;
-        pendingDebitCount ++;
+        pendingDebitAmount = pendingDebitAmount.add(amount);
+        pendingDebitCount++;
     }
 
-    public void removeSentAmountPending(Long amount) throws IllegalArgumentException {
+    public void removeSentAmountPending(BigDecimal amount) throws IllegalArgumentException {
         internalVerifyAmountForRemoval(amount, pendingDebitAmount, pendingDebitCount);
-        pendingDebitAmount -= amount;
-        pendingDebitCount --;
+        pendingDebitAmount = pendingDebitAmount.subtract(amount);
+        pendingDebitCount--;
     }
 
-    public void receiveAmountPending(Long amount) throws IllegalArgumentException {
+    public void receiveAmountPending(BigDecimal amount) throws IllegalArgumentException {
         internalVerifyAmount(amount);
-        pendingCreditAmount += amount;
-        pendingCreditCount ++;
+        pendingCreditAmount = pendingCreditAmount.add(amount);
+        pendingCreditCount++;
     }
 
-    public void removeReceivedAmountPending(Long amount) throws IllegalArgumentException {
+    public void removeReceivedAmountPending(BigDecimal amount) throws IllegalArgumentException {
         internalVerifyAmountForRemoval(amount, pendingCreditAmount, pendingCreditCount);
-        pendingCreditAmount -= amount;
-        pendingCreditCount --;
+        pendingCreditAmount = pendingCreditAmount.subtract(amount);
+        pendingCreditCount--;
     }
 
-    public void sendAmountAvailable(Long amount) throws IllegalArgumentException {
+    public void sendAmountAvailable(BigDecimal amount) throws IllegalArgumentException {
         internalVerifyAmount(amount);
-        availableDebitAmount += amount;
-        availableDebitCount ++;
+        availableDebitAmount = availableDebitAmount.add(amount);
+        availableDebitCount++;
     }
 
-    public void receiveAmountAvailable(Long amount) throws IllegalArgumentException {
+    public void receiveAmountAvailable(BigDecimal amount) throws IllegalArgumentException {
         internalVerifyAmount(amount);
-        availableCreditAmount += amount;
-        availableCreditCount ++;
+        availableCreditAmount = availableCreditAmount.add(amount);
+        availableCreditCount++;
     }
 
     // verification methods for sending and receiving money
 
-    private void internalVerifyAmount(Long amount) throws IllegalArgumentException {
-        if(amount <= 0) {                          // amount must be positive
+    private void internalVerifyAmount(BigDecimal amount) throws IllegalArgumentException {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {                          // amount must be positive
             throw new IllegalArgumentException("Amount must be positive");
         }
     }
 
-    private void internalVerifyAmountForRemoval(Long amount, Long actualAmount, int count) throws IllegalArgumentException {
+    private void internalVerifyAmountForRemoval(BigDecimal amount, BigDecimal actualAmount, int count) throws IllegalArgumentException {
         internalVerifyAmount(amount);
-        if(amount > actualAmount) {         // amount must be less than or equal to pending amount
+        if (amount.compareTo(actualAmount) > 0) {         // amount must be less than or equal to pending amount
             throw new IllegalArgumentException("Amount to remove must be less than or equal to actual amount");
         }
-        if(count <= 0) {              // pending count must be greater than 0
+        if (count <= 0) {              // pending count must be greater than 0
             throw new IllegalArgumentException("Transaction count must be greater than 0");
         }
     }

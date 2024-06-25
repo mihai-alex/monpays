@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
@@ -125,17 +126,17 @@ public class BalanceService implements IBalanceService {
     }
 
     // money is sent from the debit balance to the credit balance
-    private void internalAddSentAmountIntoPending(Long debitAmount, Long creditAmount, Balance debitBalance, Balance creditBalance) {
+    private void internalAddSentAmountIntoPending(BigDecimal debitAmount, BigDecimal creditAmount, Balance debitBalance, Balance creditBalance) {
         debitBalance.sendAmountPending(debitAmount);
         creditBalance.receiveAmountPending(creditAmount);
     }
 
-    private void internalRemoveSentAmountFromPending(Long debitAmount, Long creditAmount, Balance debitBalance, Balance creditBalance) {
+    private void internalRemoveSentAmountFromPending(BigDecimal debitAmount, BigDecimal creditAmount, Balance debitBalance, Balance creditBalance) {
         debitBalance.removeSentAmountPending(debitAmount);
         creditBalance.removeReceivedAmountPending(creditAmount);
     }
 
-    private void internalAddSentAmountIntoAvailable(Long debitAmount, Long creditAmount, Balance debitBalance, Balance creditBalance) {
+    private void internalAddSentAmountIntoAvailable(BigDecimal debitAmount, BigDecimal creditAmount, Balance debitBalance, Balance creditBalance) {
         debitBalance.sendAmountAvailable(debitAmount);
         creditBalance.receiveAmountAvailable(creditAmount);
     }

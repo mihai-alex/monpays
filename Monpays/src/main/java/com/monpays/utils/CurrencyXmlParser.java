@@ -46,6 +46,15 @@ public class CurrencyXmlParser {
                 .findAny();
     }
 
+    public int getFractionDigits(String currencyCode) {
+        return currencies
+                .stream()
+                .filter(currency -> currency.getCode().equals(currencyCode))
+                .findFirst()
+                .map(Currency::getFractionDigits)
+                .orElse(2); // default to 2 if not found
+    }
+
     private List<Currency> parseCurrenciesXml() {
         try {
             File xmlFile = new ClassPathResource(this.currenciesXmlPath).getFile();

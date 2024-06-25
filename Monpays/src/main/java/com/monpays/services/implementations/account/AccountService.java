@@ -11,11 +11,9 @@ import com.monpays.entities._generic.enums.EOperationType;
 import com.monpays.entities.account.Account;
 import com.monpays.entities.account.AccountHistoryEntry;
 import com.monpays.entities.account.AccountPending;
-import com.monpays.entities.account.AccountSpecifications;
 import com.monpays.entities.account.enums.EAccountLockStatus;
 import com.monpays.entities.account.enums.EAccountStatus;
 import com.monpays.entities.balance.Balance;
-import com.monpays.entities.profile.Profile;
 import com.monpays.entities.user.User;
 import com.monpays.mappers._generic.AuditMapper;
 import com.monpays.mappers.account.AccountMapper;
@@ -35,9 +33,9 @@ import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -91,16 +89,13 @@ public class AccountService implements IAccountService {
 
         userActivityService.add(actor, "filterAccounts", Account.class.getSimpleName());
 
-        // TODO: remove pagination and return a list
         Operation operation = new Operation(EOperationType.LIST, Account.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("no rights test");
         }
 
         auditService.add(actor, operation, null);
 
-//        Specification<Account> specification = AccountSpecifications.filterByColumn(columnName, filterValue);
-//        return accountRepository.findAll(specification).stream().map(accountMapper::toResponseDto).toList();
         return accountRepository.findAll().stream().map(accountMapper::toResponseDto).collect(Collectors.toList());
     }
 
@@ -139,13 +134,13 @@ public class AccountService implements IAccountService {
 
         AccountResponseDto accountResponseDto = accountMapper.accountToAccountResponseDto(account);
 
-        if(needsPending) {
+        if (needsPending) {
             AccountPendingResponseDto accountPendingResponseDto = accountMapper.toAccountPendingResponseDto(
                     accountPendingRepository.findByOriginalAccountNumber(account.getAccountNumber()).orElse(null));
             accountResponseDto.setPendingEntity(accountPendingResponseDto);
         }
 
-        if(needsHistory) {
+        if (needsHistory) {
             List<AccountHistoryEntryDto> accountHistoryEntryDtos = new ArrayList<>();
             List<AccountHistoryEntry> accountHistoryEntries = accountHistoryService.getByObject(account);
 
@@ -156,7 +151,7 @@ public class AccountService implements IAccountService {
             accountResponseDto.setHistory(accountHistoryEntryDtos);
         }
 
-        if(needsAudit) {
+        if (needsAudit) {
             List<AuditEntryDto> auditEntryDtos = new ArrayList<>();
             List<AuditEntry> auditEntries = auditService.getByObject(Account.class.getSimpleName(), account.getAccountNumber());
 
@@ -171,7 +166,7 @@ public class AccountService implements IAccountService {
 
     @Override
     public Account classifiedGetOne(String accountNumber) {
-       return accountRepository.findByAccountNumber(accountNumber).orElseThrow();
+        return accountRepository.findByAccountNumber(accountNumber).orElseThrow();
     }
 
     @Override
@@ -182,21 +177,20 @@ public class AccountService implements IAccountService {
         userActivityService.add(actor, "create", Account.class.getSimpleName());
 
         // should be positive
-        if(accountRequestDto.getTransactionLimit() <= 0) {
+        if (accountRequestDto.getTransactionLimit().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ServiceException("");
         }
 
-        if(accountRepository.findByAccountNumber(accountRequestDto.getAccountNumber()).isPresent()) {
+        if (accountRepository.findByAccountNumber(accountRequestDto.getAccountNumber()).isPresent()) {
             return internalRepair(actor, accountRequestDto);
-        }
-        else {
+        } else {
             return internalCreate(actor, accountRequestDto);
         }
     }
 
     private AccountResponseDto internalCreate(User actor, AccountRequestDto accountRequestDto) {
         Operation operation = new Operation(EOperationType.CREATE, Account.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
@@ -222,17 +216,16 @@ public class AccountService implements IAccountService {
 
     private AccountResponseDto internalRepair(User actor, AccountRequestDto accountRequestDto) {
         Operation operation = new Operation(EOperationType.REPAIR, Account.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
         Account account = accountRepository.findByAccountNumber(accountRequestDto.getAccountNumber()).orElseThrow();
-        if(account.getStatus() != EAccountStatus.IN_REPAIR) {
+        if (account.getStatus() != EAccountStatus.IN_REPAIR) {
             throw new ServiceException("Sir, you cannot repair an account that is not in repair.");
         }
         AccountPending accountPending = accountPendingRepository.findByOriginalAccountNumber(account.getAccountNumber()).orElseThrow();
 
-        // TODO: move this in the mappers
         account.setName(accountPending.getName());
         account.setTransactionLimit(accountPending.getTransactionLimit());
         account.setStatus(EAccountStatus.REPAIRED);
@@ -261,11 +254,11 @@ public class AccountService implements IAccountService {
         userActivityService.add(actor, "modify", Account.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.MODIFY, Account.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
-        if(!Objects.equals(accountNumber, accountRequestDto.getAccountNumber())) {
+        if (!Objects.equals(accountNumber, accountRequestDto.getAccountNumber())) {
             throw new ServiceException("");
         }
 
@@ -275,14 +268,13 @@ public class AccountService implements IAccountService {
         }
 
         // should be positive
-        if(accountRequestDto.getTransactionLimit() <= 0) {
+        if (accountRequestDto.getTransactionLimit().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ServiceException("");
         }
 
         Account originalAccount = accountRepository.findByAccountNumber(accountNumber).orElseThrow();
 
         AccountPending accountPending = accountMapper.mapToAccountPending(originalAccount, actorUsername);
-        // TODO: add mapper
         accountPending.setName(accountRequestDto.getName());
         accountPending.setTransactionLimit(accountRequestDto.getTransactionLimit());
 
@@ -294,7 +286,6 @@ public class AccountService implements IAccountService {
 
         auditService.add(actor, operation, accountNumber);
 
-        // TODO: add mapper for the deep copy into "addToHistory":
         Account addToHistory = new Account();
         addToHistory.setId(originalAccount.getId());
         addToHistory.setVersion(originalAccount.getVersion());
@@ -310,6 +301,7 @@ public class AccountService implements IAccountService {
         return accountMapper.toAccountPendingResponseDto(accountPending);
     }
 
+
     @Override
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public boolean remove(String actorUsername, String accountNumber) {
@@ -318,16 +310,15 @@ public class AccountService implements IAccountService {
         userActivityService.add(actor, "remove", Account.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.REMOVE, Account.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
         Optional<Account> toDeleteAccountOptional = accountRepository.findByAccountNumber(accountNumber);
         Account toDeleteAccount;
-        if(toDeleteAccountOptional.isEmpty()) {
+        if (toDeleteAccountOptional.isEmpty()) {
             return false;
-        }
-        else {
+        } else {
             toDeleteAccount = toDeleteAccountOptional.get();
         }
 
@@ -336,11 +327,11 @@ public class AccountService implements IAccountService {
             throw new ServiceException("");
         }
 
-        if(toDeleteAccount.getAccountLockStatus() != EAccountLockStatus.CLOSED) {
+        if (toDeleteAccount.getAccountLockStatus() != EAccountLockStatus.CLOSED) {
             throw new ServiceException("Sir, you cannot remove an account that is not closed.");
         }
 
-        if(toDeleteAccount.getStatus() == EAccountStatus.REMOVED) {
+        if (toDeleteAccount.getStatus() == EAccountStatus.REMOVED) {
             throw new ServiceException("Sir, you cannot remove an account that is already removed.");
         }
 
@@ -349,7 +340,6 @@ public class AccountService implements IAccountService {
         try {
             accountPendingRepository.save(accountPending);
         } catch (OptimisticLockingFailureException e) {
-            // Handle optimistic locking failure - versioning
             throw new RuntimeException("Concurrent update detected. Please try again.");
         }
 
@@ -378,7 +368,7 @@ public class AccountService implements IAccountService {
         userActivityService.add(actor, "approve", Account.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.APPROVE, Account.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
@@ -395,8 +385,10 @@ public class AccountService implements IAccountService {
             case "created", "repaired" -> {
                 result = internalApproveCreation(account, accountPending);
             }
-            default -> {result = internalApproveModification(account, accountPending);}
-        };
+            default -> {
+                result = internalApproveModification(account, accountPending);
+            }
+        }
 
         auditService.add(actor, operation, accountNumber);
         return result;
@@ -410,13 +402,13 @@ public class AccountService implements IAccountService {
 
             Balance balance0 = new Balance();
             balance0.setAccount(account);
-            balance0.setAvailableCreditAmount(0L);
+            balance0.setAvailableCreditAmount(BigDecimal.ZERO);
             balance0.setAvailableCreditCount(0);
-            balance0.setAvailableDebitAmount(0L);
+            balance0.setAvailableDebitAmount(BigDecimal.ZERO);
             balance0.setAvailableDebitCount(0);
-            balance0.setPendingCreditAmount(0L);
+            balance0.setPendingCreditAmount(BigDecimal.ZERO);
             balance0.setPendingCreditCount(0);
-            balance0.setPendingDebitAmount(0L);
+            balance0.setPendingDebitAmount(BigDecimal.ZERO);
             balance0.setPendingDebitCount(0);
             balanceRepository.save(balance0);
 
@@ -441,14 +433,12 @@ public class AccountService implements IAccountService {
         try {
             originalAccount = accountRepository.save(originalAccount);
         } catch (OptimisticLockingFailureException e) {
-            // Handle optimistic locking failure - versioning
             throw new ServiceException("Concurrent update detected. Please try again.");
         }
 
         // delete the pending entry from the pending table
         accountPendingRepository.delete(accountPending);
 
-        // TODO: add mapper or CopyConstructor
         Account addToHistory = new Account();
         addToHistory.setId(originalAccount.getId());
         addToHistory.setVersion(originalAccount.getVersion());
@@ -472,7 +462,7 @@ public class AccountService implements IAccountService {
         userActivityService.add(actor, "reject", Account.class.getSimpleName());
 
         Operation operation = new Operation(EOperationType.REJECT, Account.class.getSimpleName());
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
@@ -491,7 +481,9 @@ public class AccountService implements IAccountService {
             case "repaired" -> {
                 result = internalRejectReparation(account, accountPending);
             }
-            default -> {result = internalRejectModification(account, accountPending);}
+            default -> {
+                result = internalRejectModification(account, accountPending);
+            }
         }
 
         auditService.add(actor, operation, accountNumber);
@@ -521,10 +513,8 @@ public class AccountService implements IAccountService {
     }
 
     private boolean internalRejectModification(Account oldAccount, AccountPending accountPending) {
-        // delete the pending entry from the pending table
         accountPendingRepository.delete(accountPending);
 
-        // TODO: add mapper
         Account addToHistory = new Account();
         addToHistory.setId(oldAccount.getId());
         addToHistory.setVersion(oldAccount.getVersion());
@@ -544,7 +534,6 @@ public class AccountService implements IAccountService {
         AccountPending accountPending = accountPendingRepository
                 .findByOriginalAccountNumber(accountNumber).orElseThrow();
 
-        // if the same user tries to approve their own request
         if (Objects.equals(accountPending.getActorUserName(), actorUsername)) {
             throw new ServiceException("");
         }
@@ -565,7 +554,6 @@ public class AccountService implements IAccountService {
 
         Account toChangeAccount = accountRepository.findByAccountNumber(accountNumber).orElseThrow();
 
-        // Check if the account has pending modifications and requires approval/rejection
         if (this.existsPending(toChangeAccount.getAccountNumber())) {
             throw new ServiceException("");
         }
@@ -605,7 +593,7 @@ public class AccountService implements IAccountService {
             default -> throw new ServiceException("Invalid operation type.");
         }
 
-        if(!actor.hasRight(operation)) {
+        if (!actor.hasRight(operation)) {
             throw new ServiceException("");
         }
 
@@ -642,7 +630,7 @@ public class AccountService implements IAccountService {
         return true;
     }
 
-    private boolean blockCredit (User actor, Operation operation, Account toBlockAccount) {
+    private boolean blockCredit(User actor, Operation operation, Account toBlockAccount) {
         return this.internalBlockOne(EAccountLockStatus.BLOCKED_CREDIT, EAccountLockStatus.BLOCKED_DEBIT, actor, operation, toBlockAccount);
     }
 
@@ -663,8 +651,7 @@ public class AccountService implements IAccountService {
             if (toBlockAccount.getAccountLockStatus() == EAccountLockStatus.OPEN) {
                 accountPending.setAccountLockStatus(thisBlockStatus);
                 auditService.add(actor, operation, toBlockAccount.getAccountNumber());
-            }
-            else {
+            } else {
                 User system = userRepository.findByUserName("system").orElseThrow();
                 Operation systemOperation = new Operation(EOperationType.BLOCK, Account.class.getSimpleName());
                 accountPending.setAccountLockStatus(EAccountLockStatus.BLOCKED);
@@ -677,8 +664,7 @@ public class AccountService implements IAccountService {
             } catch (OptimisticLockingFailureException e) {
                 throw new RuntimeException("Concurrent update detected. Please try again.");
             }
-        }
-        catch (OptimisticLockingFailureException e) {
+        } catch (OptimisticLockingFailureException e) {
             throw new RuntimeException("Concurrent update detected. Please try again.");
         }
 
@@ -752,8 +738,7 @@ public class AccountService implements IAccountService {
             if (toUnblockAccount.getAccountLockStatus() == thisUnblockStatus) {
                 accountPending.setAccountLockStatus(EAccountLockStatus.OPEN);
                 auditService.add(actor, operation, toUnblockAccount.getAccountNumber());
-            }
-            else {
+            } else {
                 User system = userRepository.findByUserName("system").orElseThrow();
                 Operation systemOperation = new Operation(otherOperationType, Account.class.getSimpleName());
                 accountPending.setAccountLockStatus(otherUnblockStatus);
@@ -766,8 +751,7 @@ public class AccountService implements IAccountService {
             } catch (OptimisticLockingFailureException e) {
                 throw new RuntimeException("Concurrent update detected. Please try again.");
             }
-        }
-        catch (OptimisticLockingFailureException e) {
+        } catch (OptimisticLockingFailureException e) {
             throw new RuntimeException("Concurrent update detected. Please try again.");
         }
 

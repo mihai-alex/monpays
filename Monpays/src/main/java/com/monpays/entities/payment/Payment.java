@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
@@ -32,14 +33,7 @@ public class Payment {
 
     @Positive
     @Column
-    private Long amount; // Requested amount in payment currency
-    @Positive
-    @Column
-    private Long debitAmount; // Amount to be debited from debit account
-    @Positive
-    @Column
-    private Long creditAmount; // Amount to be credited to credit account
-
+    private BigDecimal amount;
     // the money is transferred FROM this account
     @ManyToOne
     private Account debitAccount;
@@ -53,4 +47,17 @@ public class Payment {
     private EPaymentType type;
     @Column
     private EPaymentStatus status;
+
+    @Column
+    private BigDecimal debitAmount;
+    @Column
+    private BigDecimal creditAmount;
+
+    public void setDebitAmountWithFraction(BigDecimal amount, int fractionDigits) {
+        this.debitAmount = amount.setScale(fractionDigits, BigDecimal.ROUND_HALF_EVEN);
+    }
+
+    public void setCreditAmountWithFraction(BigDecimal amount, int fractionDigits) {
+        this.creditAmount = amount.setScale(fractionDigits, BigDecimal.ROUND_HALF_EVEN);
+    }
 }

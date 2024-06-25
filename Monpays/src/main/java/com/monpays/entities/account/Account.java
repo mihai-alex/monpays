@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -45,7 +46,7 @@ public class Account {
 
     @Positive
     @Column
-    private Long transactionLimit;
+    private BigDecimal transactionLimit;
 
     @Column
     @Enumerated(EnumType.STRING)
