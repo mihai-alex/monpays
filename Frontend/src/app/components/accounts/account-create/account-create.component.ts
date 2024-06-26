@@ -107,6 +107,6 @@ export class AccountCreateComponent implements OnInit {
     this.snackBar.open('The account could not be created', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 }

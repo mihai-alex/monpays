@@ -77,7 +77,7 @@ export class ProfileListComponent implements OnInit {
         this.snackBar.open('The profile could not be removed!', 'Close', {
           duration: 4000,
         });
-        console.log(error);
+        // console.log(error);
       }
     );
   }

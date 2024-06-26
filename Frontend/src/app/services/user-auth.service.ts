@@ -103,7 +103,7 @@ export class UserAuthService {
       const roles = JSON.parse(rolesString) as string[];
       return roles;
     } catch (error) {
-      console.error('Error parsing roles from localStorage:', error);
+      // console.error('Error parsing roles from localStorage:', error);
       return []; // Return an empty array or handle the error as needed
     }
   }

@@ -227,7 +227,7 @@ public class UserService implements IUserService {
 
         User user = userRepository.findByUserName(userRequestDto.getUserName()).orElseThrow();
         if(user.getStatus() != EUserStatus.IN_REPAIR) {
-            throw new ServiceException("Sir, you cannot repair a user that is not in repair.");
+            throw new ServiceException("You cannot repair a user that is not in repair.");
         }
         UserPending userPending = userPendingRepository.findByOriginalUserName(user.getUserName()).orElseThrow();
 

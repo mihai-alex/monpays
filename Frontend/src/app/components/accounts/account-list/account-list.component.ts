@@ -71,7 +71,7 @@ export class AccountListComponent implements OnInit {
         this.snackBar.open('Failed to load accounts!', 'Close', {
           duration: 4000,
         });
-        console.log(error);
+        // console.log(error);
       }
     );
   }
@@ -94,7 +94,7 @@ export class AccountListComponent implements OnInit {
           duration: 4000,
         });
         this.getAccounts();
-        console.log(error);
+        // console.log(error);
       }
     );
   }
@@ -109,7 +109,7 @@ export class AccountListComponent implements OnInit {
           duration: 4000,
         });
         this.getAccounts();
-        console.log(error);
+        // console.log(error);
       }
     );
   }

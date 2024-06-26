@@ -30,14 +30,13 @@ export class UserRepairComponent implements OnInit {
     this.userName = this.activatedRoute.snapshot.params['userName'];
     this.operations = this.operationService.getOperations('user');
 
-    // show me all operations in console log:
     this.operations.subscribe((data) => {
-      console.log(data);
+      // console.log(data);
     });
 
     this.isAllowed(EOperationType.LIST).subscribe((canList) => {
       this.isAllowed(EOperationType.REPAIR).subscribe((canRepair) => {
-        console.log('canList: ' + canList + ' canRepair: ' + canRepair);
+        // console.log('canList: ' + canList + ' canRepair: ' + canRepair);
 
         if (!canList || !canRepair) {
           this.router.navigate(['/forbidden']);
@@ -82,6 +81,6 @@ export class UserRepairComponent implements OnInit {
     this.snackBar.open('The user could not be repaired!', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 }

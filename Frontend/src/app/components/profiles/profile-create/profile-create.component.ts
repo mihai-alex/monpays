@@ -211,7 +211,7 @@ export class ProfileCreateComponent implements OnInit {
     this.snackBar.open('The profile could not be created!', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 
   fetchProfileNames() {
@@ -244,7 +244,7 @@ export class ProfileCreateComponent implements OnInit {
             .map((op) => op.operation);
         },
         (error: any) => {
-          console.error(`Error fetching ${profileType} operations:`, error);
+          // console.error(`Error fetching ${profileType} operations:`, error);
         }
       );
   }

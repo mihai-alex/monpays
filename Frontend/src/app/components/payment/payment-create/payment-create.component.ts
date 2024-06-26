@@ -70,7 +70,7 @@ export class PaymentCreateComponent implements OnInit {
         this.profileNames = profileNames;
       },
       (error: any) => {
-        console.error('Error fetching profile names:', error);
+        // console.error('Error fetching profile names:', error);
       }
     );
   }
@@ -114,6 +114,6 @@ export class PaymentCreateComponent implements OnInit {
     this.snackBar.open('The payment could not be created!', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 }

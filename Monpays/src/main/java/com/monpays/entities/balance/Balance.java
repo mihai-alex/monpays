@@ -20,12 +20,12 @@ public class Balance {
     private Timestamp timestamp;
     @ManyToOne
     private Account account;
-    // money THAT HE HAS RECEIVED
+    // money THAT THE PERSON HAS RECEIVED
     @Column
     private BigDecimal availableCreditAmount;
     @Column
     private int availableCreditCount;
-    // money THAT HE HAS SENT
+    // money THAT THE PERSON HAS SENT
     @Column
     private BigDecimal availableDebitAmount;
     @Column

@@ -159,7 +159,7 @@ export class ProfileDetailsComponent {
         duration: 4000,
       }
     );
-    console.log(error);
+    // console.log(error);
   }
 
   protected readonly EOperationType = EOperationType;

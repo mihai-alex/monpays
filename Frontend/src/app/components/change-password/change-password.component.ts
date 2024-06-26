@@ -67,10 +67,10 @@ export class ChangePasswordComponent {
         this.snackBar.open('The input is not valid.', 'Close', {
           duration: 7000,
         });
-        console.error(
-          'Error changing password',
-          error.message ? error.message : error
-        );
+        // console.error(
+        //   'Error changing password',
+        //   error.message ? error.message : error
+        // );
       }
     );
   }

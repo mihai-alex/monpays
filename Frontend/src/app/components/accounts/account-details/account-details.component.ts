@@ -226,7 +226,7 @@ export class AccountDetailsComponent implements OnInit, AfterViewInit {
         duration: 4000,
       }
     );
-    console.log(error);
+    // console.log(error);
   }
 
   protected readonly EOperationType = EOperationType;

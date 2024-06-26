@@ -86,7 +86,7 @@ export class UserCreateComponent implements OnInit {
         this.profileNames = profileNames;
       },
       (error: any) => {
-        console.error('Error fetching profile names:', error);
+        // console.error('Error fetching profile names:', error);
       }
     );
   }
@@ -140,6 +140,6 @@ export class UserCreateComponent implements OnInit {
     this.snackBar.open('The user could not be created!', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 }

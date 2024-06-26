@@ -8,7 +8,6 @@ import com.monpays.entities.payment.Payment;
 import java.util.List;
 
 public interface IBalanceService {
-    // TODO: change return type to BalanceDto
     List<BalanceResponseDto> getAll(String username);
     List<BalanceResponseDto> getAllByAccount(String username, String accountNumber);
 

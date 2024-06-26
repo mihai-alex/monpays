@@ -92,7 +92,7 @@ export class UserListComponent implements OnInit {
         this.snackBar.open('The user could not be removed!', 'Close', {
           duration: 4000,
         });
-        console.log(error);
+        // console.log(error);
         this.getUsers();
       }
     );

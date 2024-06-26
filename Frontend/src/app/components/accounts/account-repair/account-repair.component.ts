@@ -134,6 +134,6 @@ export class AccountRepairComponent implements OnInit {
     this.snackBar.open('The account could not be repaired', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 }

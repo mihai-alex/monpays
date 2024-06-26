@@ -86,7 +86,7 @@ export class LoginComponent {
             }
           );
 
-          console.log(error);
+          // console.log(error);
         }
       }
     );
@@ -114,7 +114,7 @@ export class LoginComponent {
         this.snackBar.open('The verification code is not valid!', 'Close', {
           duration: 7000,
         });
-        console.log(error);
+        // console.log(error);
       },
     });
   }
@@ -136,7 +136,7 @@ export class LoginComponent {
         this.snackBar.open('The verification code is not valid!', 'Close', {
           duration: 7000,
         });
-        console.log(error);
+        // console.log(error);
       },
     });
   }
