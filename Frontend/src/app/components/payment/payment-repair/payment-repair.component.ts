@@ -32,7 +32,7 @@ export class PaymentRepairComponent implements OnInit {
 
     this.isAllowed(EOperationType.LIST).subscribe((canList) => {
       this.isAllowed(EOperationType.REPAIR).subscribe((canRepair) => {
-        console.log('canList: ' + canList + ' canRepair: ' + canRepair);
+        // console.log('canList: ' + canList + ' canRepair: ' + canRepair);
 
         if (!canList || !canRepair) {
           this.router.navigate(['/forbidden']);
@@ -79,6 +79,6 @@ export class PaymentRepairComponent implements OnInit {
     this.snackBar.open('The payment could not be repaired!', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 }

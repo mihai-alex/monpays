@@ -82,7 +82,7 @@ export class UserDetailsComponent {
           return;
         }
 
-        console.log(data);
+        // console.log(data);
 
         this.user = data;
         this.pendingUser = this.user.pendingEntity || new UserPending();
@@ -182,7 +182,7 @@ export class UserDetailsComponent {
         duration: 4000,
       }
     );
-    console.log(error);
+    // console.log(error);
   }
 
   protected readonly EOperationType = EOperationType;

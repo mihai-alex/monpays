@@ -232,7 +232,7 @@ export class ProfileModifyComponent implements OnInit {
     this.snackBar.open('The profile could not be modified!', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 
   fetchAvailableOperations(profileType: EProfileType) {
@@ -257,7 +257,7 @@ export class ProfileModifyComponent implements OnInit {
             .map((op) => op.operation);
         },
         (error: any) => {
-          console.error(`Error fetching ${profileType} operations:`, error);
+          // console.error(`Error fetching ${profileType} operations:`, error);
         }
       );
   }

@@ -75,6 +75,6 @@ export class UserModifyComponent implements OnInit {
     this.snackBar.open('The user could not be modified!', 'Close', {
       duration: 4000,
     });
-    console.log(error);
+    // console.log(error);
   }
 }
