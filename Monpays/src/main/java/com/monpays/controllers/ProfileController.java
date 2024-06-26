@@ -50,7 +50,7 @@ public class ProfileController {
         }
     }
 
-    @GetMapping("/profile-names") // TODO: remove the "/profile-names" part
+    @GetMapping("/profile-names")
     public @ResponseBody ResponseEntity<?> getProfileNames(@RequestAttribute("username") String username) {
         try {
             return new ResponseEntity<>(profileService.getProfileNames(username), HttpStatus.OK);

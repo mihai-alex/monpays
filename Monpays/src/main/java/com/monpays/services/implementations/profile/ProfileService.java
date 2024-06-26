@@ -190,7 +190,7 @@ public class ProfileService implements IProfileService {
 
         Profile profile = profileRepository.findByName(profileRequestDto.getName()).orElseThrow();
         if(profile.getStatus() != EProfileStatus.IN_REPAIR) {
-            throw new ServiceException("Sir, you cannot repair a profile that is not in repair.");
+            throw new ServiceException("You cannot repair a profile that is not in repair.");
         }
         ProfilePending profilePending = profilePendingRepository.findByOriginalProfileName(profile.getName()).orElseThrow();
 

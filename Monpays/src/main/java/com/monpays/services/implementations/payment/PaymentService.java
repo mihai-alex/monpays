@@ -77,7 +77,7 @@ public class PaymentService implements IPaymentService {
 
         Operation operation = new Operation(EOperationType.LIST, Payment.class.getSimpleName());
         if (!actor.hasRight(operation)) {
-            throw new ServiceException("Sir, you don't have the right to view all payments.");
+            throw new ServiceException("You don't have the right to view all payments.");
         }
 
         auditService.add(actor, operation, null);
@@ -131,7 +131,7 @@ public class PaymentService implements IPaymentService {
 
         Operation operation = new Operation(EOperationType.LIST, Payment.class.getSimpleName());
         if (!actor.hasRight(operation)) {
-            throw new ServiceException("Sir, you don't have the right to view all payments.");
+            throw new ServiceException("You don't have the right to view all payments.");
         }
 
         auditService.add(actor, operation, null);
@@ -149,7 +149,7 @@ public class PaymentService implements IPaymentService {
 
         Operation operation = new Operation(EOperationType.LIST, Payment.class.getSimpleName());
         if (!actor.hasRight(operation)) {
-            throw new ServiceException("Sir, you don't have the right to view all payments.");
+            throw new ServiceException("You don't have the right to view all payments.");
         }
 
         Account account = accountService.classifiedGetOne(accountNumber);
@@ -178,16 +178,16 @@ public class PaymentService implements IPaymentService {
         Payment payment = paymentMapper.toPayment(paymentRequestDto, accountRepository, currencyXmlParser);
 
         if (!Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
-            throw new ServiceException("Sir, your transaction is illegal.");
+            throw new ServiceException("Your transaction is illegal.");
         }
         if (!payment.getDebitAccount().hasRight(EAccountOperation.SEND)) {
-            throw new ServiceException("Sir, your account is not allowed to send money.");
+            throw new ServiceException("Your account is not allowed to send money.");
         }
         if (!payment.getCreditAccount().hasRight(EAccountOperation.RECEIVE)) {
-            throw new ServiceException("Sir, the account you are trying to send money to is not allowed to receive money.");
+            throw new ServiceException("The account you are trying to send money to is not allowed to receive money.");
         }
         if (paymentRepository.findByNumber(payment.getNumber()).isPresent()) {
-            throw new ServiceException("Sir, payment number already exists.");
+            throw new ServiceException("Payment number already exists.");
         }
 
         // Currency conversion
@@ -229,7 +229,7 @@ public class PaymentService implements IPaymentService {
         Payment repairPayment = paymentMapper.toPayment(paymentRequestDto, accountRepository, currencyXmlParser);
 
         if (paymentRepository.findByNumber(repairPayment.getNumber()).isEmpty()) {
-            throw new ServiceException("Sir, the account number does not exist.");
+            throw new ServiceException("The account number does not exist.");
         }
 
         Operation operation = new Operation(EOperationType.REPAIR, Payment.class.getSimpleName());
@@ -239,7 +239,7 @@ public class PaymentService implements IPaymentService {
 
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
         if (payment.getStatus() != EPaymentStatus.IN_REPAIR) {
-            throw new ServiceException("Sir, the payment is not in a state that can be repaired.");
+            throw new ServiceException("The payment is not in a state that can be repaired.");
         }
 
         // Currency conversion
@@ -284,13 +284,13 @@ public class PaymentService implements IPaymentService {
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
 
         if (Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
-            throw new ServiceException("Sir, you cannot approve your own payment.");
+            throw new ServiceException("You cannot approve your own payment.");
         }
         if (Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
-            throw new ServiceException("Sir, you cannot approve payments directed to you.");
+            throw new ServiceException("You cannot approve payments directed to you.");
         }
         if (payment.getStatus() != EPaymentStatus.CREATED && payment.getStatus() != EPaymentStatus.REPAIRED) {
-            throw new ServiceException("Sir, the payment is not in a state that can be approved.");
+            throw new ServiceException("The payment is not in a state that can be approved.");
         }
 
         internalHaltPayment(payment);
@@ -322,13 +322,13 @@ public class PaymentService implements IPaymentService {
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
 
         if (Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
-            throw new ServiceException("Sir, you cannot verify your own payment.");
+            throw new ServiceException("You cannot verify your own payment.");
         }
         if (Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
-            throw new ServiceException("Sir, you cannot verify payments directed to you.");
+            throw new ServiceException("You cannot verify payments directed to you.");
         }
         if (payment.getStatus() != EPaymentStatus.WAITING_VERIFICATION) {
-            throw new ServiceException("Sir, the payment is not in a state that can be verified.");
+            throw new ServiceException("The payment is not in a state that can be verified.");
         }
 
         if (internalNeedsAuthorization(payment)) {
@@ -357,13 +357,13 @@ public class PaymentService implements IPaymentService {
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
 
         if (Objects.equals(payment.getDebitAccount().getOwner().getUserName(), username)) {
-            throw new ServiceException("Sir, you cannot authorize your own payment.");
+            throw new ServiceException("You cannot authorize your own payment.");
         }
         if (Objects.equals(payment.getCreditAccount().getOwner().getUserName(), username)) {
-            throw new ServiceException("Sir, you cannot authorize payments directed to you.");
+            throw new ServiceException("You cannot authorize payments directed to you.");
         }
         if (payment.getStatus() != EPaymentStatus.WAITING_AUTHORIZATION) {
-            throw new ServiceException("Sir, the payment is not in a state that can be authorized.");
+            throw new ServiceException("The payment is not in a state that can be authorized.");
         }
 
         internalCompletePayment(payment);
@@ -386,14 +386,14 @@ public class PaymentService implements IPaymentService {
         }
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
         if (Objects.equals(payment.getDebitAccount().getOwner().getUserName(), actor.getUserName())) {
-            throw new ServiceException("Sir, you cannot reject your own payment.");
+            throw new ServiceException("You cannot reject your own payment.");
         }
 
         switch (payment.getStatus().name().toLowerCase()) {
             case "created" -> internalSendToRepair(payment);
             case "repaired" -> internalCancelPaymentNoHalt(payment);
             case "waiting_verification", "waiting_authorization" -> internalCancelPayment(payment);
-            default -> throw new ServiceException("Sir, the payment is not in a state that can be rejected.");
+            default -> throw new ServiceException("The payment is not in a state that can be rejected.");
         }
         payment = paymentRepository.save(payment);
         paymentHistoryService.addEntry(payment);
@@ -415,13 +415,13 @@ public class PaymentService implements IPaymentService {
 
         Payment payment = paymentRepository.findByNumber(paymentNumber).orElseThrow();
         if (!Objects.equals(payment.getDebitAccount().getOwner().getUserName(), actor.getUserName())) {
-            throw new ServiceException("Sir, you cannot cancel a payment that is not yours.");
+            throw new ServiceException("You cannot cancel a payment that is not yours.");
         }
 
         switch (payment.getStatus().name().toLowerCase()) {
             case "created", "in_repair", "repaired" -> internalCancelPaymentNoHalt(payment);
             case "waiting_verification", "waiting_authorization" -> internalCancelPayment(payment);
-            default -> throw new ServiceException("Sir, the payment is not in a state that can be canceled.");
+            default -> throw new ServiceException("The payment is not in a state that can be canceled.");
         }
 
         payment = paymentRepository.save(payment);

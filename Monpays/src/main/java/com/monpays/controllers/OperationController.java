@@ -35,7 +35,7 @@ public class OperationController {
         }
     }
 
-    @GetMapping("/profiles/{profileType}") // TODO: remove the "profiles" part from the path
+    @GetMapping("/profiles/{profileType}")
     public ResponseEntity<?> getOperationsForProfileType(@RequestAttribute String username, @PathVariable String profileType) {
         try {
             List<Operation> operations = operationService.getOperationsForRole(username, profileType);

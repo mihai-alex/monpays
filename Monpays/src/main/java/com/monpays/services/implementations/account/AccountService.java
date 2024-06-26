@@ -222,7 +222,7 @@ public class AccountService implements IAccountService {
 
         Account account = accountRepository.findByAccountNumber(accountRequestDto.getAccountNumber()).orElseThrow();
         if (account.getStatus() != EAccountStatus.IN_REPAIR) {
-            throw new ServiceException("Sir, you cannot repair an account that is not in repair.");
+            throw new ServiceException("You cannot repair an account that is not in repair.");
         }
         AccountPending accountPending = accountPendingRepository.findByOriginalAccountNumber(account.getAccountNumber()).orElseThrow();
 
@@ -328,11 +328,11 @@ public class AccountService implements IAccountService {
         }
 
         if (toDeleteAccount.getAccountLockStatus() != EAccountLockStatus.CLOSED) {
-            throw new ServiceException("Sir, you cannot remove an account that is not closed.");
+            throw new ServiceException("You cannot remove an account that is not closed.");
         }
 
         if (toDeleteAccount.getStatus() == EAccountStatus.REMOVED) {
-            throw new ServiceException("Sir, you cannot remove an account that is already removed.");
+            throw new ServiceException("You cannot remove an account that is already removed.");
         }
 
         AccountPending accountPending = accountMapper.mapToAccountPending(toDeleteAccount, actorUsername);
